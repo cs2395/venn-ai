@@ -1,0 +1,12 @@
+{
+  "name": "levelup-ai",
+  "version": "0.1.0",
+  "description": "AI networking agent — WhatsApp + LinkedIn analysis, personalized outreach, scheduling",
+  "scripts": {
+    "dev": "npx serve frontend/",
+    "deploy": "echo 'Drag frontend/ folder to app.netlify.com/drop'"
+  },
+  "keywords": ["ai", "networking", "whatsapp", "linkedin", "crewai", "n8n"],
+  "license": "UNLICENSED",
+  "private": true
+}
