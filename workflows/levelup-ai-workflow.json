@@ -1,0 +1,37 @@
+{
+  "name": "LevelUp.ai",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook"
+    },
+    {
+      "name": "Proxycurl",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait"
+    },
+    {
+      "name": "IF WhatsApp",
+      "type": "n8n-nodes-base.if"
+    },
+    {
+      "name": "Claude AI",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "name": "Supabase",
+      "type": "n8n-nodes-base.supabase"
+    },
+    {
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
