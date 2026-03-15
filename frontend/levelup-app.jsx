@@ -15,20 +15,25 @@ const RESULTS = [
   {
     name: "Sarah Chen", role: "Senior ML Engineer", company: "Anthropic",
     sentiment: "Warm & Interested", priority: "HIGH",
+    sources: [
+      { platform: "linkedin", url: "https://linkedin.com/in/sarahchen" },
+      { platform: "whatsapp", url: null },
+      { platform: "web", url: "https://anthropic.com" },
+    ],
     talkingPoints: [
-      "Her multi-agent orchestration work — ask about coordination challenges at scale",
-      "RAG pipeline improvements — share your latest context-window workaround",
-      "Anthropic's approach to tool-use agents — potential collaboration angle",
+      { text: "Her multi-agent orchestration work — ask about coordination challenges at scale", source: "https://linkedin.com/in/sarahchen", platform: "linkedin" },
+      { text: "RAG pipeline improvements — share your latest context-window workaround", source: null, platform: "whatsapp" },
+      { text: "Anthropic's approach to tool-use agents — potential collaboration angle", source: "https://anthropic.com", platform: "web" },
     ],
     keyFacts: [
-      "Works on agent coordination at Anthropic — deeply technical",
-      "Initiated follow-up — suggested coffee next week (high intent)",
-      "Shared interest: RAG architectures + LLM orchestration",
+      { text: "Works on agent coordination at Anthropic — deeply technical", source: "https://linkedin.com/in/sarahchen", platform: "linkedin" },
+      { text: "Initiated follow-up — suggested coffee next week (high intent)", source: null, platform: "whatsapp" },
+      { text: "Shared interest: RAG architectures + LLM orchestration", source: null, platform: "whatsapp" },
     ],
     actionItems: [
-      "Book coffee meeting Tuesday or Wednesday afternoon",
-      "Share your RAG pipeline demo repo before the meeting",
-      "Explore: Could her multi-agent work integrate with LevelUp's pipeline?",
+      { text: "Book coffee meeting Tuesday or Wednesday afternoon", source: null, platform: "whatsapp" },
+      { text: "Share your RAG pipeline demo repo before the meeting", source: null, platform: "whatsapp" },
+      { text: "Explore: Could her multi-agent work integrate with LevelUp's pipeline?", source: "https://linkedin.com/in/sarahchen", platform: "linkedin" },
     ],
     draftMessage: `Hey Sarah — really enjoyed our conversation at the AI Summit yesterday. Your perspective on multi-agent orchestration was fascinating, especially the coordination challenges you mentioned.\n\nI've been thinking more about how RAG layers could solve some of those context-window limitations we discussed. Would love to continue that thread over coffee — are you free Tuesday or Wednesday afternoon?`,
     tone: "Professional-warm",
@@ -36,27 +41,33 @@ const RESULTS = [
   {
     name: "Marcus Johnson", role: "Partner", company: "Gradient Ventures",
     sentiment: "Enthusiastic", priority: "HIGH",
+    sources: [
+      { platform: "linkedin", url: "https://linkedin.com/in/marcusjohnson" },
+      { platform: "whatsapp", url: null },
+      { platform: "web", url: "https://gradient.com" },
+    ],
     talkingPoints: [
-      "His portfolio's AI automation investments — what patterns is he seeing?",
-      "LevelUp.ai's traction plan — he offered intros, come prepared with metrics",
-      "Ask about Gradient's thesis on B2B AI tools — align your pitch",
+      { text: "His portfolio's AI automation investments — what patterns is he seeing?", source: "https://linkedin.com/in/marcusjohnson", platform: "linkedin" },
+      { text: "LevelUp.ai's traction plan — he offered intros, come prepared with metrics", source: null, platform: "whatsapp" },
+      { text: "Ask about Gradient's thesis on B2B AI tools — align your pitch", source: "https://gradient.com", platform: "web" },
     ],
     keyFacts: [
-      "Partner at Gradient Ventures — active AI/automation investor",
-      "He initiated the investor intro offer (unprompted = strong signal)",
-      "Connected at networking mixer — casual rapport already built",
+      { text: "Partner at Gradient Ventures — active AI/automation investor", source: "https://linkedin.com/in/marcusjohnson", platform: "linkedin" },
+      { text: "He initiated the investor intro offer (unprompted = strong signal)", source: null, platform: "whatsapp" },
+      { text: "Connected at networking mixer — casual rapport already built", source: null, platform: "whatsapp" },
     ],
     actionItems: [
-      "Send LevelUp.ai one-pager before his intro meeting",
-      "Prepare 2-min pitch with early traction numbers",
-      "Ask: Who specifically at Gradient should see this?",
+      { text: "Send LevelUp.ai one-pager before his intro meeting", source: null, platform: "whatsapp" },
+      { text: "Prepare 2-min pitch with early traction numbers", source: null, platform: "whatsapp" },
+      { text: "Ask: Who specifically at Gradient should see this?", source: "https://linkedin.com/in/marcusjohnson", platform: "linkedin" },
     ],
     draftMessage: `Marcus! Great meeting you at the mixer. Really appreciate your enthusiasm about LevelUp.ai — means a lot coming from someone at Gradient.\n\nI'd love to take you up on that investor intro. Happy to send over a one-pager or jump on a quick call this week to give you the full picture first. Whatever's easiest for you.`,
     tone: "Casual-confident",
   },
 ];
 
-const N8N_WEBHOOK_URL = null;
+const N8N_WEBHOOK_URL = "https://n8n-production-e7a9.up.railway.app/webhook-test/levelup-agent";
+const ANTHROPIC_API_KEY = null; // Set your key to enable direct Claude API analysis
 
 export default function LevelUpApp() {
   const [screen, setScreen] = useState("landing");
@@ -69,17 +80,115 @@ export default function LevelUpApp() {
   const [fbP, setFbP] = useState("");
   const [fbT, setFbT] = useState("");
   const [fbDone, setFbDone] = useState(false);
+  const [results, setResults] = useState(RESULTS);
 
-  const runAIPipeline = () => {
+  const runAIPipeline = async () => {
+    if (!ANTHROPIC_API_KEY) {
+      setResults(RESULTS);
+      setActive(0);
+      setAgentStep(0);
+      setTimeout(() => setAgentStep(1), 2000);
+      setTimeout(() => setAgentStep(2), 4000);
+      setTimeout(() => { setAgentStep(3); setTimeout(() => setScreen("results"), 700); }, 5800);
+      return;
+    }
+
     setAgentStep(0);
     setTimeout(() => setAgentStep(1), 2000);
     setTimeout(() => setAgentStep(2), 4000);
-    setTimeout(() => { setAgentStep(3); setTimeout(() => setScreen("results"), 700); }, 5800);
+
+    try {
+      const linkedinContext = liRows
+        .filter(r => r.name || r.url)
+        .map(r => `- Name: ${r.name || "Unknown"}, Role: ${r.role || "Unknown"}, Company: ${r.company || "Unknown"}, LinkedIn URL: ${r.url || "N/A"}`)
+        .join("\n");
+
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-5-20250929",
+          max_tokens: 4096,
+          tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
+          system: `You are a networking analysis AI for LevelUp.ai. Analyze WhatsApp conversations and LinkedIn context to generate actionable networking intelligence. Use web_search to look up LinkedIn profiles and companies for current information. Return ONLY a valid JSON array (no markdown, no code fences, no explanation). Each element must match this exact schema:
+{
+  "name": "string",
+  "role": "string",
+  "company": "string",
+  "sentiment": "string (e.g. Warm & Interested, Enthusiastic, Professional)",
+  "priority": "HIGH | MEDIUM | LOW",
+  "talkingPoints": [{"text": "string", "source": "url or null", "platform": "linkedin|x|instagram|whatsapp|web"}],
+  "keyFacts": [{"text": "string", "source": "url or null", "platform": "linkedin|x|instagram|whatsapp|web"}],
+  "actionItems": [{"text": "string", "source": "url or null", "platform": "linkedin|x|instagram|whatsapp|web"}],
+  "draftMessage": "string (personalized follow-up message in the user's voice, matching their texting style from the chat)",
+  "tone": "string (e.g. Professional-warm, Casual-confident)",
+  "sources": [{"platform": "linkedin|x|instagram|whatsapp|web", "url": "the profile/page URL found, or null for whatsapp"}]
+}
+Rules:
+- Provide exactly 3 talking points, 3 key facts, and 3 action items per contact
+- Each item must include a "source" (the URL where you found the info, or null if from the chat) and "platform" (linkedin, x, instagram, whatsapp, or web)
+- The draft message must match the user's writing style from the WhatsApp chat
+- Analyze ALL unique contacts in the chat (excluding "You")
+- Use web search to enrich each contact with current professional info
+- Include a "sources" array listing all platforms used (linkedin, x, instagram, whatsapp, web) with their URLs`,
+          messages: [{
+            role: "user",
+            content: `Analyze this WhatsApp conversation and generate networking intelligence for each contact:\n\n--- WHATSAPP CHAT ---\n${chatText}\n\n--- LINKEDIN CONTEXT ---\n${linkedinContext || "No LinkedIn data provided — use web search to find profiles."}`
+          }],
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Claude API returned ${res.status}`);
+      const data = await res.json();
+
+      // Extract text content from the response (skip tool_use blocks)
+      const textBlock = data.content?.find(b => b.type === "text");
+      if (!textBlock?.text) throw new Error("No text in Claude response");
+
+      // Parse JSON from the response (handle potential markdown fences)
+      const jsonStr = textBlock.text.replace(/^```json?\s*\n?/, "").replace(/\n?```\s*$/, "").trim();
+      const parsed = JSON.parse(jsonStr);
+      const contacts = Array.isArray(parsed) ? parsed : [parsed];
+
+      setResults(contacts.map((d, i) => ({
+        name: d.name || liRows[i]?.name || "Contact",
+        role: d.role || liRows[i]?.role || "",
+        company: d.company || liRows[i]?.company || "",
+        sentiment: d.sentiment || "Analyzed",
+        priority: d.priority || "HIGH",
+        talkingPoints: (d.talkingPoints || d.talking_points || []).map(tp =>
+          typeof tp === "string" ? { text: tp, source: null, platform: "web" } : tp
+        ),
+        keyFacts: (d.keyFacts || d.key_facts || []).map(kf =>
+          typeof kf === "string" ? { text: kf, source: null, platform: "web" } : kf
+        ),
+        actionItems: (d.actionItems || d.action_items || []).map(ai =>
+          typeof ai === "string" ? { text: ai, source: null, platform: "web" } : ai
+        ),
+        draftMessage: d.draftMessage || d.draft_message || "",
+        tone: d.tone || "Professional",
+        sources: d.sources || [],
+      })));
+      setActive(0);
+      setAgentStep(3);
+      setTimeout(() => setScreen("results"), 700);
+    } catch (err) {
+      console.error("Claude API pipeline error:", err);
+      setResults(RESULTS);
+      setActive(0);
+      setAgentStep(3);
+      setTimeout(() => setScreen("results"), 700);
+    }
   };
 
   const runN8nPipeline = async () => {
     if (!N8N_WEBHOOK_URL) {
-      runAIPipeline();
+      await runAIPipeline();
       return;
     }
     try {
@@ -96,10 +205,26 @@ export default function LevelUpApp() {
         }),
       });
       if (!res.ok) throw new Error(`n8n returned ${res.status}`);
+      const data = await res.json();
+      const contacts = Array.isArray(data) ? data : [data];
+      setResults(contacts.map((d, i) => ({
+        name: d.name || liRows[i]?.name || "Contact",
+        role: d.role || liRows[i]?.role || "",
+        company: d.company || liRows[i]?.company || "",
+        sentiment: d.sentiment || "Analyzed",
+        priority: d.priority || "HIGH",
+        talkingPoints: d.talking_points || d.talkingPoints || [],
+        keyFacts: d.key_facts || d.keyFacts || [],
+        actionItems: d.action_items || d.actionItems || [],
+        draftMessage: d.draftMessage || d.draft_message || "",
+        tone: d.tone || "Professional",
+        sources: d.sources || [],
+      })));
+      setActive(0);
       setAgentStep(3);
       setTimeout(() => setScreen("results"), 700);
     } catch {
-      runAIPipeline();
+      await runAIPipeline();
     }
   };
 
@@ -460,12 +585,12 @@ export default function LevelUpApp() {
               padding: "18px 22px", marginBottom: 26,
             }}>
               <span style={{ fontSize: 18, fontWeight: 800, color: "var(--g)", fontFamily: "'Syne',sans-serif" }}>✓ PIPELINE COMPLETE </span>
-              <span style={{ fontSize: 13, color: "#888", fontFamily: "'Manrope',sans-serif" }}>— 2 contacts · 6 talking points · 6 key facts · 6 action items · 2 messages</span>
+              <span style={{ fontSize: 13, color: "#888", fontFamily: "'Manrope',sans-serif" }}>— {results.length} contact{results.length !== 1 ? "s" : ""} · {results.reduce((s, c) => s + (c.talkingPoints?.length || 0), 0)} talking points · {results.reduce((s, c) => s + (c.keyFacts?.length || 0), 0)} key facts · {results.reduce((s, c) => s + (c.actionItems?.length || 0), 0)} action items · {results.length} message{results.length !== 1 ? "s" : ""}</span>
             </div>
 
             {/* Contact tabs */}
             <div className="contact-tabs" style={{ marginBottom: 24 }}>
-              {RESULTS.map((c, i) => (
+              {results.map((c, i) => (
                 <button key={i} onClick={() => setActive(i)} style={{
                   flex: 1, padding: "16px 18px", textAlign: "left",
                   background: active === i ? "var(--gd)" : "var(--card)",
@@ -483,9 +608,49 @@ export default function LevelUpApp() {
             </div>
 
             {(() => {
-              const c = RESULTS[active];
+              const c = results[active];
               return (
                 <div key={active} style={{ animation: "fadeIn 0.3s ease" }}>
+                  {/* Source attribution line */}
+                  <div style={{
+                    marginBottom: 18, padding: "12px 16px",
+                    background: "var(--card)", border: "1px solid var(--bdr)", borderRadius: 8,
+                    fontSize: 13, color: "#888", fontFamily: "'Manrope',sans-serif", lineHeight: 1.7,
+                  }}>
+                    <span style={{ fontWeight: 700, color: "#ccc" }}>{c.name}</span>
+                    <span style={{ color: "#555" }}> — {c.role}, {c.company}</span>
+                    <br />
+                    <span style={{ color: "#666" }}>Analysis based on: </span>
+                    {(() => {
+                      const platformInfo = { linkedin: { icon: "🔗", label: "LinkedIn" }, x: { icon: "𝕏", label: "X" }, instagram: { icon: "📷", label: "Instagram" }, whatsapp: { icon: "💬", label: "WhatsApp" }, web: { icon: "🌐", label: "Web Search" } };
+                      const srcs = c.sources && c.sources.length > 0
+                        ? c.sources
+                        : [...new Map(
+                            [...(c.talkingPoints || []), ...(c.keyFacts || []), ...(c.actionItems || [])]
+                              .filter(item => typeof item === "object" && item?.platform)
+                              .map(item => [item.platform, { platform: item.platform, url: item.source }])
+                          ).values()];
+                      return srcs.map((s, si) => {
+                        const p = platformInfo[s.platform];
+                        if (!p) return null;
+                        return (
+                          <span key={si}>
+                            {si > 0 && <span style={{ color: "#444", margin: "0 6px" }}>·</span>}
+                            {s.url ? (
+                              <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--g)", textDecoration: "none", fontWeight: 600, transition: "opacity .2s" }}>
+                                {p.icon} {p.label}
+                              </a>
+                            ) : (
+                              <span style={{ color: "#777", fontWeight: 600 }}>{p.icon} {p.label}</span>
+                            )}
+                          </span>
+                        );
+                      });
+                    })()}
+                    <span style={{ color: "#555", fontSize: 12, marginLeft: 4 }}> where available</span>
+                    <span style={{ color: "#444", fontSize: 11, fontStyle: "italic" }}> (greater access available for Premium users)</span>
+                  </div>
+
                   <div className="results-3col" style={{ marginBottom: 22 }}>
                     {[
                       { title: "🎯 TOP 3 TALKING POINTS", items: c.talkingPoints, clr: "var(--g)", blr: "rgba(0,230,118,0.16)" },
@@ -499,13 +664,41 @@ export default function LevelUpApp() {
                       }}>
                         <h3 style={{ fontSize: 12, fontWeight: 800, color: sec.clr, fontFamily: "'Syne',sans-serif", letterSpacing: "0.04em", marginBottom: 16 }}>{sec.title}</h3>
                         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                          {sec.items.map((item, ii) => (
-                            <div key={ii} style={{
-                              fontSize: 14, color: "#ccc", lineHeight: 1.6,
-                              fontFamily: "'Manrope',sans-serif", paddingLeft: 14,
-                              borderLeft: `2px solid ${sec.blr}`,
-                            }}>{item}</div>
-                          ))}
+                          {sec.items.map((item, ii) => {
+                            const isObj = typeof item === "object" && item !== null;
+                            const text = isObj ? item.text : item;
+                            const platform = isObj ? item.platform : null;
+                            const source = isObj ? item.source : null;
+                            const badges = { linkedin: { label: "LI", bg: "rgba(0,119,181,0.15)", color: "#0077B5" }, x: { label: "X", bg: "rgba(255,255,255,0.08)", color: "#aaa" }, instagram: { label: "IG", bg: "rgba(225,48,108,0.15)", color: "#E1306C" }, whatsapp: { label: "WA", bg: "rgba(37,211,102,0.15)", color: "#25D366" }, web: { label: "Web", bg: "rgba(66,133,244,0.15)", color: "#4285F4" } };
+                            const badge = platform && badges[platform];
+                            return (
+                              <div key={ii} style={{
+                                fontSize: 14, color: "#ccc", lineHeight: 1.6,
+                                fontFamily: "'Manrope',sans-serif", paddingLeft: 14,
+                                borderLeft: `2px solid ${sec.blr}`,
+                                display: "flex", alignItems: "flex-start", gap: 8,
+                              }}>
+                                <span style={{ flex: 1 }}>{text}</span>
+                                {badge && (
+                                  source ? (
+                                    <a href={source} target="_blank" rel="noopener noreferrer" style={{
+                                      fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 3,
+                                      background: badge.bg, color: badge.color, textDecoration: "none",
+                                      fontFamily: "'Space Mono',monospace", letterSpacing: "0.04em",
+                                      flexShrink: 0, marginTop: 3, transition: "opacity .2s",
+                                    }}>{badge.label}</a>
+                                  ) : (
+                                    <span style={{
+                                      fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 3,
+                                      background: badge.bg, color: badge.color,
+                                      fontFamily: "'Space Mono',monospace", letterSpacing: "0.04em",
+                                      flexShrink: 0, marginTop: 3, opacity: 0.7,
+                                    }}>{badge.label}</span>
+                                  )
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     ))}
