@@ -56,6 +56,8 @@ const RESULTS = [
   },
 ];
 
+const N8N_WEBHOOK_URL = null;
+
 export default function LevelUpApp() {
   const [screen, setScreen] = useState("landing");
   const [chatText, setChatText] = useState("");
@@ -68,11 +70,37 @@ export default function LevelUpApp() {
   const [fbT, setFbT] = useState("");
   const [fbDone, setFbDone] = useState(false);
 
-  const run = () => {
+  const runAIPipeline = () => {
     setAgentStep(0);
     setTimeout(() => setAgentStep(1), 2000);
     setTimeout(() => setAgentStep(2), 4000);
     setTimeout(() => { setAgentStep(3); setTimeout(() => setScreen("results"), 700); }, 5800);
+  };
+
+  const runN8nPipeline = async () => {
+    if (!N8N_WEBHOOK_URL) {
+      runAIPipeline();
+      return;
+    }
+    try {
+      setAgentStep(0);
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: liRows[0]?.name || "",
+          linkedin_url: liRows[0]?.url || "",
+          whatsapp_text: chatText,
+          user_id: "demo-user",
+          scheduling_pref: "google",
+        }),
+      });
+      if (!res.ok) throw new Error(`n8n returned ${res.status}`);
+      setAgentStep(3);
+      setTimeout(() => setScreen("results"), 700);
+    } catch {
+      runAIPipeline();
+    }
   };
 
   const uLi = (i, f, v) => { const c = [...liRows]; c[i][f] = v; setLiRows(c); };
@@ -368,7 +396,7 @@ export default function LevelUpApp() {
             </div>
 
             <div style={{ textAlign: "center" }}>
-              <button className="cta" onClick={() => { if (chatText) { setScreen("processing"); setTimeout(run, 400); }}}
+              <button className="cta" onClick={() => { if (chatText) { setScreen("processing"); setTimeout(runN8nPipeline, 400); }}}
                 style={{ opacity: chatText ? 1 : 0.35, cursor: chatText ? "pointer" : "default" }}>
                 🚀 RUN LEVELUP PIPELINE
               </button>

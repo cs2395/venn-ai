@@ -1,37 +1,203 @@
 {
-  "name": "LevelUp.ai",
+  "name": "LevelUp.ai Agent",
   "nodes": [
     {
+      "id": "1",
       "name": "Webhook",
-      "type": "n8n-nodes-base.webhook"
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "levelup-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "levelup-webhook"
     },
     {
+      "id": "2",
       "name": "Proxycurl",
-      "type": "n8n-nodes-base.httpRequest"
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://nubela.co/proxycurl/api/v2/linkedin",
+        "options": {}
+      }
     },
     {
+      "id": "3",
       "name": "Wait",
-      "type": "n8n-nodes-base.wait"
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "unit": "seconds",
+        "value": 2
+      }
     },
     {
+      "id": "4",
       "name": "IF WhatsApp",
-      "type": "n8n-nodes-base.if"
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        920,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [],
+          "combinator": "and"
+        }
+      }
     },
     {
+      "id": "5",
       "name": "Claude AI",
-      "type": "n8n-nodes-base.httpRequest"
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1160,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "options": {}
+      }
     },
     {
-      "name": "Supabase",
-      "type": "n8n-nodes-base.supabase"
+      "id": "6",
+      "name": "Supabase Insert",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        300
+      ],
+      "parameters": {
+        "operation": "insert",
+        "tableId": "analyses"
+      }
     },
     {
+      "id": "7",
       "name": "Respond",
-      "type": "n8n-nodes-base.respondToWebhook"
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1640,
+        300
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, analysis: $json }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
     }
   ],
-  "connections": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Proxycurl",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proxycurl": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "IF WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Claude AI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Claude AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude AI": {
+      "main": [
+        [
+          {
+            "node": "Supabase Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Insert": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
   "settings": {
-    "executionOrder": "v1"
-  }
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [],
+  "versionId": "1"
 }
