@@ -1,6 +1,6 @@
 # Venn.ai
 
-**AI networking agent** — analyzes WhatsApp chats + LinkedIn profiles → generates talking points, key facts, action items, and follow-up messages in your voice.
+**AI business realtionship intelligence agent** — analyzes WhatsApp chats + LinkedIn profiles → generates talking points, key facts, action items, and follow-up messages in your voice.
 
 ## Quick Start (Demo)
 
