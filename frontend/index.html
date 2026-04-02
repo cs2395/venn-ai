@@ -1,822 +1,1094 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Venn.ai — Work Smarter: Make More Real Connections. Automate with AI.</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
-<body style="margin:0;background:#0a0a0a">
-  <div id="root"></div>
-  <script type="text/babel">
-const { useState, useEffect } = React;
-
-const SAMPLE_WHATSAPP = `1/15/25, 9:03 AM - Sarah Chen: Hey! Great meeting you at the AI Summit yesterday
-1/15/25, 9:04 AM - Sarah Chen: Your demo of the RAG pipeline was really impressive
-1/15/25, 9:15 AM - You: Thanks Sarah! Your work on multi-agent systems at Anthropic is exactly what we're exploring
-1/15/25, 9:16 AM - You: Would love to continue the conversation sometime
-1/15/25, 9:20 AM - Sarah Chen: Absolutely! I'm free next week if you want to grab coffee
-1/15/25, 10:45 AM - Marcus Johnson: Yo! Marcus from the networking mixer
-1/15/25, 10:46 AM - Marcus Johnson: That startup idea you mentioned — the automated follow-up thing — I know some investors who'd be interested
-1/15/25, 10:50 AM - You: Marcus! Great connecting. Yeah Venn.ai is what we're calling it
-1/15/25, 10:51 AM - You: Would love an intro if you're open to it
-1/15/25, 10:55 AM - Marcus Johnson: For sure. Let me set something up this week`;
-
-const RESULTS = [
-  {
-    name: "Sarah Chen", role: "Senior ML Engineer", company: "Anthropic",
-    sentiment: "Warm & Interested", priority: "HIGH",
-    sources: [
-      { platform: "linkedin", url: "https://linkedin.com/in/sarahchen" },
-      { platform: "whatsapp", url: null },
-      { platform: "web", url: "https://anthropic.com" },
-    ],
-    talkingPoints: [
-      { text: "Her multi-agent orchestration work — ask about coordination challenges at scale", source: "https://linkedin.com/in/sarahchen", platform: "linkedin" },
-      { text: "RAG pipeline improvements — share your latest context-window workaround", source: null, platform: "whatsapp" },
-      { text: "Anthropic's approach to tool-use agents — potential collaboration angle", source: "https://anthropic.com", platform: "web" },
-    ],
-    keyFacts: [
-      { text: "Works on agent coordination at Anthropic — deeply technical", source: "https://linkedin.com/in/sarahchen", platform: "linkedin" },
-      { text: "Initiated follow-up — suggested coffee next week (high intent)", source: null, platform: "whatsapp" },
-      { text: "Shared interest: RAG architectures + LLM orchestration", source: null, platform: "whatsapp" },
-    ],
-    actionItems: [
-      { text: "Book coffee meeting Tuesday or Wednesday afternoon", source: null, platform: "whatsapp" },
-      { text: "Share your RAG pipeline demo repo before the meeting", source: null, platform: "whatsapp" },
-      { text: "Explore: Could her multi-agent work integrate with Venn's pipeline?", source: "https://linkedin.com/in/sarahchen", platform: "linkedin" },
-    ],
-    draftMessage: "Hey Sarah — really enjoyed our conversation at the AI Summit yesterday. Your perspective on multi-agent orchestration was fascinating, especially the coordination challenges you mentioned.\n\nI've been thinking more about how RAG layers could solve some of those context-window limitations we discussed. Would love to continue that thread over coffee — are you free Tuesday or Wednesday afternoon?",
-    tone: "Professional-warm",
-  },
-  {
-    name: "Marcus Johnson", role: "Partner", company: "Gradient Ventures",
-    sentiment: "Enthusiastic", priority: "HIGH",
-    sources: [
-      { platform: "linkedin", url: "https://linkedin.com/in/marcusjohnson" },
-      { platform: "whatsapp", url: null },
-      { platform: "web", url: "https://gradient.com" },
-    ],
-    talkingPoints: [
-      { text: "His portfolio's AI automation investments — what patterns is he seeing?", source: "https://linkedin.com/in/marcusjohnson", platform: "linkedin" },
-      { text: "Venn.ai's traction plan — he offered intros, come prepared with metrics", source: null, platform: "whatsapp" },
-      { text: "Ask about Gradient's thesis on B2B AI tools — align your pitch", source: "https://gradient.com", platform: "web" },
-    ],
-    keyFacts: [
-      { text: "Partner at Gradient Ventures — active AI/automation investor", source: "https://linkedin.com/in/marcusjohnson", platform: "linkedin" },
-      { text: "He initiated the investor intro offer (unprompted = strong signal)", source: null, platform: "whatsapp" },
-      { text: "Connected at networking mixer — casual rapport already built", source: null, platform: "whatsapp" },
-    ],
-    actionItems: [
-      { text: "Send Venn.ai one-pager before his intro meeting", source: null, platform: "whatsapp" },
-      { text: "Prepare 2-min pitch with early traction numbers", source: null, platform: "whatsapp" },
-      { text: "Ask: Who specifically at Gradient should see this?", source: "https://linkedin.com/in/marcusjohnson", platform: "linkedin" },
-    ],
-    draftMessage: "Marcus! Great meeting you at the mixer. Really appreciate your enthusiasm about Venn.ai — means a lot coming from someone at Gradient.\n\nI'd love to take you up on that investor intro. Happy to send over a one-pager or jump on a quick call this week to give you the full picture first. Whatever's easiest for you.",
-    tone: "Casual-confident",
-  },
-];
-
-const N8N_WEBHOOK_URL = "https://n8n-production-e7a9.up.railway.app/webhook/levelup-agent";
-
-function VennApp() {
-  const [screen, setScreen] = useState("landing");
-  const [chatText, setChatText] = useState("");
-  const [liRows, setLiRows] = useState([{ name: "", role: "", company: "", url: "" }]);
-  const [agentStep, setAgentStep] = useState(-1);
-  const [active, setActive] = useState(0);
-  const [copied, setCopied] = useState(-1);
-  const [fbR, setFbR] = useState(0);
-  const [fbP, setFbP] = useState("");
-  const [fbT, setFbT] = useState("");
-  const [fbDone, setFbDone] = useState(false);
-  const [results, setResults] = useState(RESULTS);
-
-  const runAIPipeline = async () => {
-    if (!ANTHROPIC_API_KEY) {
-      setResults(RESULTS);
-      setActive(0);
-      setAgentStep(0);
-      setTimeout(() => setAgentStep(1), 2000);
-      setTimeout(() => setAgentStep(2), 4000);
-      setTimeout(() => { setAgentStep(3); setTimeout(() => setScreen("results"), 700); }, 5800);
-      return;
-    }
-
-    setAgentStep(0);
-    setTimeout(() => setAgentStep(1), 2000);
-    setTimeout(() => setAgentStep(2), 4000);
-
-    try {
-      const linkedinContext = liRows
-        .filter(r => r.name || r.url)
-        .map(r => `- Name: ${r.name || "Unknown"}, Role: ${r.role || "Unknown"}, Company: ${r.company || "Unknown"}, LinkedIn URL: ${r.url || "N/A"}`)
-        .join("\n");
-
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-5-20250929",
-          max_tokens: 4096,
-          tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
-          system: `You are a networking analysis AI for Venn.ai. Analyze WhatsApp conversations and LinkedIn context to generate actionable networking intelligence. Use web_search to look up LinkedIn profiles and companies for current information. Return ONLY a valid JSON array (no markdown, no code fences, no explanation). Each element must match this exact schema:
-{
-  "name": "string",
-  "role": "string",
-  "company": "string",
-  "sentiment": "string (e.g. Warm & Interested, Enthusiastic, Professional)",
-  "priority": "HIGH | MEDIUM | LOW",
-  "talkingPoints": [{"text": "string", "source": "url or null", "platform": "linkedin|x|instagram|whatsapp|web"}],
-  "keyFacts": [{"text": "string", "source": "url or null", "platform": "linkedin|x|instagram|whatsapp|web"}],
-  "actionItems": [{"text": "string", "source": "url or null", "platform": "linkedin|x|instagram|whatsapp|web"}],
-  "draftMessage": "string (personalized follow-up message in the user's voice, matching their texting style from the chat)",
-  "tone": "string (e.g. Professional-warm, Casual-confident)",
-  "sources": [{"platform": "linkedin|x|instagram|whatsapp|web", "url": "the profile/page URL found, or null for whatsapp"}]
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LevelUp.ai">
+<meta name="theme-color" content="#080c0a">
+<link rel="manifest" href="manifest.json">
+<title>LevelUp.ai — 5-Agent Relationship Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c0a;
+  --bg2: #0f1410;
+  --bg3: #161d18;
+  --card: #1a2420;
+  --lu: #00E676;
+  --lu2: #00c766;
+  
+  
+  --teal: #00C9B1;
+  
+  --red: #FF5C5C;
+  --text: #e8f0eb;
+  --muted: #7a9080;
+  --faint: rgba(255,255,255,0.07);
+  --border: rgba(0,230,118,0.15);
 }
-Rules:
-- Provide exactly 3 talking points, 3 key facts, and 3 action items per contact
-- Each item must include a "source" (the URL where you found the info, or null if from the chat) and "platform" (linkedin, x, instagram, whatsapp, or web)
-- The draft message must match the user's writing style from the WhatsApp chat
-- Analyze ALL unique contacts in the chat (excluding "You")
-- Use web search to enrich each contact with current professional info
-- Include a "sources" array listing all platforms used (linkedin, x, instagram, whatsapp, web) with their URLs`,
-          messages: [{
-            role: "user",
-            content: `Analyze this WhatsApp conversation and generate networking intelligence for each contact:\n\n--- WHATSAPP CHAT ---\n${chatText}\n\n--- LINKEDIN CONTEXT ---\n${linkedinContext || "No LinkedIn data provided — use web search to find profiles."}`
-          }],
-        }),
-      });
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow: hidden; }
 
-      if (!res.ok) throw new Error(`Claude API returned ${res.status}`);
-      const data = await res.json();
-      console.log("Claude API raw response:", JSON.stringify(data));
+/* APP SHELL */
+#app { height: 100vh; display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; position: relative; overflow: hidden; }
 
-      const textBlocks = data.content?.filter(b => b.type === "text");
-      const textBlock = textBlocks?.[textBlocks.length - 1];
-      console.log("Parsed text block:", textBlock?.text?.substring(0, 500));
-      if (!textBlock?.text) throw new Error("No text in Claude response");
+/* SCREENS */
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s; }
+.screen.hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
+.screen.exit { transform: translateX(-100%); opacity: 0; pointer-events: none; }
 
-      const rawText = textBlock.text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-      const start = rawText.indexOf("[");
-      const end = rawText.lastIndexOf("]");
-      if (start === -1 || end === -1) throw new Error("No JSON array found");
-      const jsonStr = rawText.substring(start, end + 1);
-      const parsed = JSON.parse(jsonStr);
-      const contacts = Array.isArray(parsed) ? parsed : [parsed];
+/* HEADER */
+.top-bar { padding: 16px 20px 0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--lu); letter-spacing: -0.02em; }
+.logo span { color: var(--text); font-weight: 700; }
+.progress-dots { display: flex; gap: 5px; align-items: center; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); transition: all 0.3s; }
+.dot.active { background: var(--lu); width: 18px; border-radius: 3px; }
+.dot.done { background: var(--lu); opacity: 0.5; }
 
-      setResults(contacts.map((d, i) => ({
-        name: d.name || liRows[i]?.name || "Contact",
-        role: d.role || liRows[i]?.role || "",
-        company: d.company || liRows[i]?.company || "",
-        sentiment: d.sentiment || "Analyzed",
-        priority: d.priority || "HIGH",
-        talkingPoints: (d.talkingPoints || d.talking_points || []).map(tp =>
-          typeof tp === "string" ? { text: tp, source: null, platform: "web" } : tp
-        ),
-        keyFacts: (d.keyFacts || d.key_facts || []).map(kf =>
-          typeof kf === "string" ? { text: kf, source: null, platform: "web" } : kf
-        ),
-        actionItems: (d.actionItems || d.action_items || []).map(ai =>
-          typeof ai === "string" ? { text: ai, source: null, platform: "web" } : ai
-        ),
-        draftMessage: d.draftMessage || d.draft_message || "",
-        tone: d.tone || "Professional",
-        sources: d.sources || [],
-      })));
-      setActive(0);
-      setAgentStep(3);
-      setTimeout(() => setScreen("results"), 700);
-    } catch (err) {
-      console.error("Claude API pipeline error:", err);
-      console.error("Pipeline parse error:", err.message);
-      setResults(RESULTS);
-      setActive(0);
-      setAgentStep(3);
-      setTimeout(() => setScreen("results"), 700);
-    }
-  };
+/* SCROLL CONTENT */
+.scroll-content { flex: 1; overflow-y: auto; padding: 0 20px 100px; -webkit-overflow-scrolling: touch; }
+.scroll-content::-webkit-scrollbar { display: none; }
 
-  const runN8nPipeline = async () => {
-    if (!N8N_WEBHOOK_URL) {
-      await runAIPipeline();
-      return;
-    }
-    try {
-      setAgentStep(0);
-      const res = await fetch(N8N_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: liRows[0]?.name || "",
-          linkedin_url: liRows[0]?.url || "",
-          whatsapp_text: chatText,
-          user_id: "00000000-0000-0000-0000-000000000001",
-          scheduling_pref: "google",
-        }),
-      });
-      if (!res.ok) throw new Error(`n8n returned ${res.status}`);
-      const data = await res.json();
-      const raw = data.analysis || data; const contacts = Array.isArray(raw) ? raw : [raw];
-      setResults(contacts.map((d, i) => ({
-        name: d.name || liRows[i]?.name || "Contact",
-        role: d.role || liRows[i]?.role || "",
-        company: d.company || liRows[i]?.company || "",
-        sentiment: d.sentiment || "Analyzed",
-        priority: d.priority || "HIGH",
-        talkingPoints: d.talking_points || d.talkingPoints || [],
-        keyFacts: d.key_facts || d.keyFacts || [],
-        actionItems: d.action_items || d.actionItems || [],
-        draftMessage: d.draftMessage || d.draft_message || "",
-        tone: d.tone || "Professional",
-        sources: d.sources || [],
-      })));
-      setActive(0);
-      setAgentStep(3);
-      setTimeout(() => setScreen("results"), 700);
-    } catch {
-      await runAIPipeline();
-    }
-  };
+/* HERO SCREEN */
+.hero-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.3); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--gold2); margin: 24px 0 20px; }
+.hero-tag::before { content: '✦'; font-size: 10px; }
+h1.hero { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1.15; color: #2d6648; margin-bottom: 8px; }
+h1.hero .accent { color: var(--lu); }
+.hero-dim { color: #2d6648; }
+.hero-mid { color: #3d9960; }  
+.hero-bright { color: #00E676; }
+.hero-sub { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+.hero-sub strong { color: var(--text); }
 
-  const uLi = (i, f, v) => { const c = [...liRows]; c[i][f] = v; setLiRows(c); };
+/* SURVEY CARD */
+.survey-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 20px; padding: 20px; margin-top: 20px; }
+.q-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lu); margin-bottom: 10px; }
+.q-text { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.3; color: #fff; margin-bottom: 6px; }
+.q-hint { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+.progress-bar-wrap { height: 3px; background: var(--faint); border-radius: 2px; margin-bottom: 20px; }
+.progress-bar-fill { height: 100%; border-radius: 2px; background: var(--lu); transition: width 0.4s; }
 
-  return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#f5f5f5", fontFamily: "'Syne',sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Manrope:wght@300;400;500;600;700;800&display=swap');
-        :root {
-          --g: #00E676; --gl: #66FFA6; --gd: rgba(0,230,118,0.10); --gg: rgba(0,230,118,0.22);
-          --g2: #00C853; --g2d: rgba(0,200,83,0.10);
-          --bg: #0a0a0a; --card: rgba(255,255,255,0.035); --bdr: rgba(255,255,255,0.07);
-        }
-        *{box-sizing:border-box;margin:0;padding:0}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        @keyframes glow{0%,100%{box-shadow:0 0 16px rgba(0,230,118,0.1)}50%{box-shadow:0 0 32px rgba(0,230,118,0.28)}}
-        @keyframes scan{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes countUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(0,230,118,0.16);border-radius:8px}
-        textarea:focus,input:focus{outline:none;border-color:var(--g)!important}
+/* OPTION ITEMS */
+.option-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+.option-item:active { transform: scale(0.98); }
+.option-item.selected { border-color: var(--gold); background: rgba(212,168,67,0.10); }
+.option-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
+.option-text { flex: 1; font-size: 14px; line-height: 1.4; color: var(--text); }
+.option-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+.option-item.selected .option-check { background: var(--gold); border-color: var(--gold); }
+.option-check::after { content: '✓'; font-size: 11px; color: #fff; opacity: 0; transition: opacity 0.2s; }
+.option-item.selected .option-check::after { opacity: 1; color: #000; }
 
-        .cta{background:var(--g);color:#0a0a0a;border:none;padding:18px 44px;border-radius:4px;font-size:17px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;letter-spacing:0.05em;text-transform:uppercase;transition:all .2s;white-space:nowrap}
-        .cta:hover{box-shadow:0 6px 32px rgba(0,230,118,0.35);transform:translateY(-2px)}
-        .cta2{background:var(--g2);color:#0a0a0a;border:none;padding:14px 32px;border-radius:4px;font-size:15px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;letter-spacing:0.04em;text-transform:uppercase;transition:all .2s;white-space:nowrap}
-        .cta2:hover{box-shadow:0 5px 28px rgba(0,200,83,0.3);transform:translateY(-1px)}
-        .cta-o{background:transparent;color:#f5f5f5;border:2px solid rgba(255,255,255,0.2);padding:16px 36px;border-radius:4px;font-size:15px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;letter-spacing:0.04em;transition:all .2s;white-space:nowrap}
-        .cta-o:hover{border-color:var(--g);color:var(--g)}
-        .inp{width:100%;background:rgba(255,255,255,0.04);border:1.5px solid var(--bdr);border-radius:6px;padding:14px 16px;color:#e0e0e0;font-size:15px;font-family:'Manrope',sans-serif;transition:border .2s}
+/* RADIO ITEMS */
+.radio-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+.radio-item.selected { border-color: var(--gold2); background: rgba(212,168,67,0.12); }
+.radio-dot { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.radio-item.selected .radio-dot { background: var(--gold); border-color: var(--gold); }
+.radio-item.selected .radio-dot::after { content: ''; display: block; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
 
-        /* RESPONSIVE */
-        .hero-title { font-size: 72px; }
-        .hero-sub { font-size: 20px; max-width: 720px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); }
-        .stats-num { font-size: 40px; }
-        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .feat-title { font-size: 21px; }
-        .input-section { padding: 36px 32px; }
-        .input-h { font-size: 30px; }
-        .steps-row { display: flex; }
-        .li-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1.3fr; gap: 10px; }
-        .results-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-        .contact-tabs { display: flex; gap: 12px; }
-        .msg-btns { display: flex; gap: 10px; flex-wrap: wrap; }
-        .process-title { font-size: 40px; }
-        .section-title { font-size: 38px; }
-        .page-pad { padding-left: 36px; padding-right: 36px; }
-        .nav-pad { padding: 14px 32px; }
-        .cta-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-        .fb-grid { max-width: 520px; }
+/* TEXT AREA */
+.other-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
+.voice-row { display: flex; gap: 10px; align-items: flex-start; }
+textarea.other-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; resize: none; height: 80px; outline: none; }
+textarea.other-input::placeholder { color: var(--muted); }
+textarea.other-input:focus { border-color: var(--gold); }
+.mic-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--faint); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+.voice-link { font-size: 13px; color: var(--gold2); margin-top: 6px; cursor: pointer; }
 
-        @media (max-width: 768px) {
-          .hero-title { font-size: 40px !important; }
-          .hero-sub { font-size: 16px !important; }
-          .stats-grid { grid-template-columns: repeat(2,1fr) !important; gap: 0; }
-          .stats-num { font-size: 30px !important; }
-          .features-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
-          .feat-title { font-size: 18px !important; }
-          .input-section { padding: 24px 18px !important; }
-          .input-h { font-size: 22px !important; }
-          .steps-row { flex-wrap: wrap !important; gap: 6px !important; }
-          .li-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
-          .results-3col { grid-template-columns: 1fr !important; gap: 10px !important; }
-          .contact-tabs { flex-direction: column !important; gap: 8px !important; }
-          .msg-btns { flex-direction: column !important; gap: 8px !important; }
-          .msg-btns .cta, .msg-btns .cta2, .msg-btns .cta-o { width: 100% !important; text-align: center !important; }
-          .process-title { font-size: 28px !important; }
-          .section-title { font-size: 26px !important; }
-          .page-pad { padding-left: 16px !important; padding-right: 16px !important; }
-          .nav-pad { padding: 12px 16px !important; }
-          .cta { padding: 16px 28px !important; font-size: 15px !important; }
-          .cta2 { padding: 14px 24px !important; font-size: 14px !important; }
-          .cta-o { padding: 14px 24px !important; font-size: 14px !important; }
-          .cta-row { flex-direction: column !important; align-items: stretch !important; }
-          .cta-row .cta, .cta-row .cta-o { width: 100% !important; text-align: center !important; }
-          .fb-grid { max-width: 100% !important; }
-        }
+/* BUTTONS */
+.btn-primary { width: 100%; padding: 16px; border-radius: 14px; background: var(--gold); border: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+.btn-secondary { flex: 1; padding: 14px; border-radius: 12px; background: transparent; border: 1px solid var(--faint); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:active { background: var(--faint); }
+.btn-lu { width: 100%; padding: 16px; border-radius: 14px; background: var(--lu); border: none; color: #000; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-lu:active { transform: scale(0.98); }
+.btn-amber { width: 100%; padding: 16px; border-radius: 14px; background: var(--gold); border: none; color: #000; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-row { display: flex; gap: 10px; }
 
-        @media (max-width: 480px) {
-          .hero-title { font-size: 32px !important; line-height: 1.1 !important; }
-          .hero-sub { font-size: 15px !important; }
-          .stats-num { font-size: 26px !important; }
-          .input-h { font-size: 20px !important; }
-          .process-title { font-size: 24px !important; }
-          .section-title { font-size: 22px !important; }
-        }
-      `}</style>
+/* STICKY BOTTOM */
+.sticky-bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 20px 32px; background: linear-gradient(to top, var(--bg) 70%, transparent); max-width: 430px; margin: 0 auto; }
 
-      {/* BG */}
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-        <div style={{ position: "absolute", top: "-18%", left: "8%", width: 550, height: 550, borderRadius: "50%", background: "radial-gradient(circle,rgba(0,230,118,0.05) 0%,transparent 70%)" }} />
-        <div style={{ position: "absolute", bottom: "-12%", right: "4%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(0,200,83,0.04) 0%,transparent 70%)" }} />
+/* SCORE SCREEN */
+.score-card { background: var(--bg3); border: 1px solid rgba(212,168,67,0.3); border-radius: 20px; padding: 24px 20px; margin-top: 20px; text-align: center; }
+.score-badge { display: inline-block; background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.3); border-radius: 20px; padding: 6px 16px; font-size: 12px; color: var(--gold2); margin-bottom: 16px; }
+.score-num { font-family: 'Syne', sans-serif; font-size: 80px; font-weight: 800; color: var(--gold2); line-height: 1; margin-bottom: 4px; }
+.score-label { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.score-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.progress-pill { height: 6px; background: var(--faint); border-radius: 3px; margin: 16px 0 0; overflow: hidden; }
+.progress-pill-fill { height: 100%; border-radius: 3px; background: var(--lu); width: 87%; }
+.time-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 20px; padding: 20px; margin-top: 12px; }
+.time-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.time-num { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--teal); line-height: 1; }
+.time-num span { font-size: 28px; font-weight: 600; }
+.time-sub { font-size: 13px; color: var(--muted); margin: 4px 0 14px; }
+.time-divider { height: 1px; background: var(--faint); margin: 12px 0; }
+.time-tag { display: inline-block; background: rgba(0,201,177,0.1); border: 1px solid rgba(0,201,177,0.25); border-radius: 8px; padding: 5px 12px; font-size: 12px; color: var(--teal); margin: 4px 4px 0 0; }
+
+/* EMAIL GATE */
+.email-section { background: var(--bg3); border: 1px solid var(--faint); border-radius: 20px; padding: 20px; margin-top: 20px; }
+.email-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.email-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
+input.email-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; margin-bottom: 12px; }
+input.email-input:focus { border-color: var(--gold); }
+input.email-input::placeholder { color: var(--muted); }
+.fine-print { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; line-height: 1.5; }
+.skip-link { text-align: center; margin-top: 14px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.skip-link a { color: var(--lu); text-decoration: none; }
+
+/* CHANNEL SELECT */
+.channel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.channel-card { background: var(--bg3); border: 1.5px solid var(--faint); border-radius: 16px; padding: 18px 14px; cursor: pointer; transition: all 0.2s; text-align: center; }
+.channel-card:active { transform: scale(0.97); }
+.channel-card.selected { border-color: var(--lu); background: rgba(0,230,118,0.08); }
+.channel-icon { font-size: 32px; margin-bottom: 10px; }
+.channel-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.channel-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.channel-card.selected .channel-name { color: var(--lu); }
+
+/* LOADING */
+.loading-ring { width: 64px; height: 64px; border: 3px solid var(--faint); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 32px auto 24px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 6px; }
+.loading-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 32px; }
+.loading-steps { display: flex; flex-direction: column; gap: 14px; padding: 0 8px; }
+.loading-step { display: flex; align-items: center; gap: 14px; }
+.step-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+.step-text { font-size: 14px; color: var(--muted); transition: color 0.3s; }
+.step-text.active { color: var(--text); }
+.step-text.done { color: var(--lu); }
+
+/* OUTPUT */
+.usage-bar { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--faint); border-radius: 12px; padding: 10px 14px; margin-top: 16px; }
+.usage-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+.usage-text { flex: 1; font-size: 12px; color: var(--muted); }
+.usage-text strong { color: var(--text); }
+.tier-badge { background: var(--bg); border: 1px solid var(--faint); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--muted); }
+
+.section-head { display: flex; align-items: center; gap: 10px; margin: 24px 0 12px; }
+.section-icon { font-size: 18px; }
+.section-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--lu); }
+.section-line { flex: 1; height: 1px; background: var(--faint); }
+
+.contact-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 14px; }
+.contact-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(0,230,118,0.10); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.contact-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: #fff; }
+.contact-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.new-badge { background: rgba(0,201,177,0.15); border: 1px solid rgba(0,201,177,0.3); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--teal); margin-left: auto; }
+
+.facts-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; overflow: hidden; }
+.fact-item { padding: 14px 16px; border-bottom: 1px solid var(--faint); }
+.fact-item:last-child { border-bottom: none; }
+.fact-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: rgba(0,230,118,0.12); border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--lu); margin-bottom: 8px; }
+.fact-text { font-size: 13px; line-height: 1.55; color: var(--text); }
+.source-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.src-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--muted); }
+
+.talking-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
+.tp-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lu); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.tp-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--gold); border-radius: 6px; font-size: 11px; color: #fff; font-weight: 700; }
+.tp-text { font-size: 14px; line-height: 1.55; color: var(--text); margin-bottom: 10px; }
+.tp-quote { border-left: 2px solid var(--gold); padding-left: 12px; margin-top: 8px; }
+.tp-quote-text { font-size: 12px; font-style: italic; color: var(--muted); line-height: 1.5; }
+
+.action-item { display: flex; align-items: flex-start; gap: 12px; background: var(--bg3); border: 1px solid var(--faint); border-radius: 12px; padding: 14px; margin-bottom: 8px; }
+.action-check { width: 20px; height: 20px; border: 1.5px solid var(--teal); border-radius: 5px; flex-shrink: 0; margin-top: 1px; }
+.action-text { font-size: 13px; line-height: 1.4; color: var(--text); }
+.action-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.draft-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; }
+.draft-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.draft-text { font-size: 14px; line-height: 1.7; color: var(--text); }
+
+.tone-section { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; margin-top: 12px; }
+.tone-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.tone-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.tone-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.tone-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tone-chip { padding: 7px 14px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+.tone-chip.selected { background: rgba(0,230,118,0.10); border-color: var(--lu); color: var(--lu); }
+.feedback-row { display: flex; gap: 10px; margin-bottom: 10px; }
+textarea.feedback-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; resize: none; height: 70px; outline: none; }
+textarea.feedback-input:focus { border-color: var(--gold); }
+textarea.feedback-input::placeholder { color: var(--muted); }
+.btn-regen { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,230,118,0.08); border: 1px solid var(--border); color: var(--lu); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+.sched-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0; }
+.sched-btn { background: var(--bg3); border: 1px solid var(--faint); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); cursor: pointer; transition: all 0.2s; }
+.sched-btn:active { border-color: var(--lu); background: rgba(0,230,118,0.06); }
+
+/* PRO UPSELL */
+.pro-card { background: #110f08; border: 1px solid var(--gold-border); border-radius: 20px; padding: 20px; margin-top: 12px; }
+.pro-tag { display: inline-block; background: var(--gold); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 700; color: #000; margin-bottom: 12px; }
+.pro-headline { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.2; }
+.pro-desc { font-size: 13px; color: rgba(212,168,67,0.7); line-height: 1.5; margin-bottom: 16px; }
+.pro-feature { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.pro-feature:last-of-type { border-bottom: none; }
+.pro-fi { font-size: 16px; width: 24px; flex-shrink: 0; }
+.pro-ft { font-size: 13px; color: var(--text); line-height: 1.4; }
+.pro-lock { background: rgba(255,255,255,0.08); border-radius: 6px; padding: 2px 8px; font-size: 10px; color: var(--muted); margin-left: auto; flex-shrink: 0; }
+.pro-price { color: var(--lu); font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; color: var(--gold); margin: 16px 0 4px; }
+.pro-price span { font-size: 14px; font-weight: 400; color: var(--muted); }
+.pro-fine { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+/* WA INTEGRATION SCREEN */
+.integration-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
+.integration-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.integration-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.integration-icon.wa { background: rgba(37,211,102,0.15); }
+.integration-icon.li { background: rgba(10,102,194,0.15); }
+.integration-icon.ig { background: rgba(225,48,108,0.15); }
+.integration-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
+.integration-sub { font-size: 11px; color: var(--muted); }
+.connect-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--lu); background: rgba(0,230,118,0.08); color: var(--lu); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.connect-btn:active { background: rgba(0,230,118,0.15); }
+.connect-btn.connected { background: rgba(0,230,118,0.12); color: var(--lu); border-color: var(--lu); }
+.connected-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--lu); margin-top: 6px; }
+
+/* INPUT SCREEN */
+.input-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lu); margin-bottom: 8px; }
+input.text-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; margin-bottom: 14px; }
+input.text-input:focus { border-color: var(--lu); }
+input.text-input::placeholder { color: var(--muted); }
+textarea.wa-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.6; resize: none; height: 160px; outline: none; margin-bottom: 14px; }
+textarea.wa-input:focus { border-color: var(--lu); }
+textarea.wa-input::placeholder { color: var(--muted); }
+.sample-btn { background: rgba(0,230,118,0.08); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: var(--lu); cursor: pointer; margin-bottom: 14px; display: inline-block; }
+.input-hint { font-size: 11px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+.input-hint a { color: var(--gold2); text-decoration: none; }
+
+
+/* AGENT STEPS */
+.agent-icon { font-size: 22px; width: 36px; height: 36px; border-radius: 10px; background: rgba(0,230,118,0.08); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+.agent-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--muted); transition: color 0.3s; margin-bottom: 2px; }
+.agent-desc { font-size: 11px; color: var(--muted); opacity: 0.6; transition: opacity 0.3s; }
+.agent-status { margin-left: auto; font-size: 14px; flex-shrink: 0; }
+.loading-step { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; border: 1px solid transparent; transition: all 0.4s; }
+.loading-step.active { background: rgba(0,230,118,0.06); border-color: var(--border); }
+.loading-step.active .agent-name { color: var(--lu); }
+.loading-step.active .agent-desc { opacity: 1; color: var(--muted); }
+.loading-step.active .agent-icon { background: rgba(0,230,118,0.15); border-color: var(--lu); }
+.loading-step.done .agent-name { color: var(--lu); }
+.loading-step.done .agent-icon { background: rgba(0,230,118,0.12); border-color: var(--lu); }
+
+
+/* PRICING CARDS */
+.pricing-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 18px; padding: 20px; }
+.pricing-featured { border-color: var(--border); background: var(--bg2); box-shadow: 0 0 0 1px rgba(0,230,118,0.08); }
+.pf-row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--faint); }
+.pf-row:last-of-type { border-bottom: none; }
+.pf-icon { font-size: 15px; width: 22px; flex-shrink: 0; margin-top: 1px; }
+.pf-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+.pf-text strong { font-weight: 600; }
+.pf-locked .pf-icon { opacity: 0.3; }
+.pf-dim { color: var(--muted) !important; }
+.bill-chip { padding: 6px 14px; border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid var(--faint); font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; }
+.bill-active { background: rgba(0,230,118,0.08); border-color: var(--border); color: var(--lu); }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+.fade-up-1 { animation-delay: 0.05s; opacity: 0; }
+.fade-up-2 { animation-delay: 0.1s; opacity: 0; }
+.fade-up-3 { animation-delay: 0.15s; opacity: 0; }
+.fade-up-4 { animation-delay: 0.2s; opacity: 0; }
+.fade-up-5 { animation-delay: 0.25s; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ===== SCREEN 0: HERO ===== -->
+<div class="screen" id="s0">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot active" id="d0"></div>
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+      <div class="dot" id="d4"></div>
+      <div class="dot" id="d5"></div>
+      <div class="dot" id="d6"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="hero-tag fade-up fade-up-1">5-Agent Relationship Intelligence · Free Preview</div>
+    <h1 class="hero fade-up fade-up-2"><span class="hero-dim">Work Smarter:</span><br><span class="hero-mid">Your AI<br>Connections Agent.</span><br><span class="hero-bright">Make Stronger<br>Connections Faster.</span></h1>
+    <p class="hero-sub fade-up fade-up-3"><strong>30 seconds, not 30 minutes.</strong><br>Answer 3 quick questions to unlock your free Relationship Intelligence Agent.</p>
+
+    <div class="survey-card fade-up fade-up-4">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:14%"></div></div>
+      <div class="q-label">Question 1 of 3</div>
+      <div class="q-text">What are your biggest blockers to following up with new contacts?</div>
+      <div class="q-hint">Select all that apply</div>
+
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">📋</div>
+        <div class="option-text">Takes too long to research relevant information about contacts</div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">⏱️</div>
+        <div class="option-text">Too busy to follow up — contacts go cold</div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">😟</div>
+        <div class="option-text">Follow-ups feel generic and ineffective</div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">🤝</div>
+        <div class="option-text">Follow-ups feel like asking for help or a benefit too soon</div>
+        <div class="option-check"></div>
       </div>
 
-      {/* NAV */}
-      <nav className="nav-pad" style={{
-        position: "sticky", top: 0, zIndex: 100,
-        borderBottom: "1px solid var(--bdr)",
-        backdropFilter: "blur(20px)", background: "rgba(10,10,10,0.88)",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }} onClick={() => setScreen("landing")}>
-          <span style={{ color: "var(--g)", fontSize: 20, fontWeight: 800 }}>⚡</span>
-          <span style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>LEVEL</span>
-          <span style={{ fontSize: 18, fontWeight: 800, color: "var(--g)", letterSpacing: "-0.02em" }}>UP</span>
-          <span style={{ fontSize: 18, fontWeight: 500, color: "#555" }}>.AI</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {screen !== "landing" && (
-            <button onClick={() => setScreen("landing")} style={{ background: "none", border: "none", color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>HOME</button>
-          )}
-          <button onClick={() => setScreen("input")} style={{
-            background: "none", border: "2px solid var(--g)", color: "var(--g)",
-            padding: "7px 18px", fontSize: 12, fontWeight: 800,
-            fontFamily: "'Syne',sans-serif", cursor: "pointer", letterSpacing: "0.05em",
-          }}>TRY DEMO</button>
-        </div>
-      </nav>
+      <div class="other-label">Anything else? Tell us directly.</div>
+      <div class="voice-row">
+        <textarea class="other-input" placeholder="e.g. I meet great people but never know how to reconnect authentically..."></textarea>
+        <div class="mic-btn">🎙️</div>
+      </div>
+      <div class="voice-link">Tap to answer by voice</div>
+    </div>
+  </div>
+  <div class="sticky-bottom">
+    <button class="btn-primary" onclick="goTo(1)">Next →</button>
+  </div>
+</div>
 
-      <div style={{ position: "relative", zIndex: 1 }}>
+<!-- ===== SCREEN 1: Q2 ===== -->
+<div class="screen hidden" id="s1">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="survey-card" style="margin-top:20px">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:43%"></div></div>
+      <div class="q-label">Question 2 of 3</div>
+      <div class="q-text">How often do contacts fade after meeting?</div>
+      <div class="q-hint">Be honest — this is anonymous</div>
 
-        {/* LANDING */}
-        {screen === "landing" && (
-          <div style={{ animation: "fadeUp 0.5s ease" }}>
-            <section className="page-pad" style={{ paddingTop: 60, paddingBottom: 40, maxWidth: 960, margin: "0 auto", textAlign: "center" }}>
-
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                border: "1.5px solid rgba(0,230,118,0.28)", borderRadius: 30,
-                padding: "9px 22px", marginBottom: 32, background: "var(--gd)",
-              }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--g)", display: "inline-block" }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--g)", fontFamily: "'Syne',sans-serif", letterSpacing: "0.04em" }}>
-                  Free Beta — Try It Now
-                </span>
-              </div>
-
-              <h1 className="hero-title" style={{
-                fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.04em",
-                fontFamily: "'Syne',sans-serif", marginBottom: 26,
-              }}>
-                <span style={{ color: "#fff" }}>Your AI</span><br />
-                <span style={{ color: "var(--g)" }}>Networking Agent</span>
-              </h1>
-
-              <p className="hero-sub" style={{
-                color: "#aaa", lineHeight: 1.65, margin: "0 auto 40px",
-                fontFamily: "'Manrope',sans-serif", fontWeight: 400,
-              }}>
-                Integrates with <strong style={{ color: "var(--g)" }}>WhatsApp</strong> &{" "}
-                <strong style={{ color: "var(--g)" }}>LinkedIn</strong> to give you customized talking points,
-                draft follow-ups in <em>your voice</em>, and schedule meetings — all automatically.
-              </p>
-
-              <div className="cta-row" style={{ marginBottom: 50 }}>
-                <button className="cta" onClick={() => setScreen("input")}>TRY LEVELUP FREE →</button>
-                <button className="cta-o" onClick={() => document.getElementById("feat")?.scrollIntoView({ behavior: "smooth" })}>See How It Works ↓</button>
-              </div>
-
-              {/* STATS */}
-              <div className="stats-grid" style={{
-                borderTop: "1px solid var(--bdr)", borderBottom: "1px solid var(--bdr)", padding: "24px 0",
-              }}>
-                {[
-                  { num: "3", label: "TALKING POINTS" },
-                  { num: "3", label: "KEY FACTS" },
-                  { num: "∞", label: "ACTION ITEMS" },
-                  { num: "1-CLICK", label: "SCHEDULING" },
-                ].map((s, i) => (
-                  <div key={i} style={{
-                    textAlign: "center", padding: "10px 0",
-                    borderRight: i < 3 ? "1px solid var(--bdr)" : "none",
-                    animation: `countUp 0.5s ease ${0.1 + i * 0.1}s both`,
-                  }}>
-                    <div className="stats-num" style={{ fontWeight: 800, color: "var(--g)", fontFamily: "'Syne',sans-serif", letterSpacing: "-0.03em", marginBottom: 3 }}>{s.num}</div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#666", fontFamily: "'Space Mono',monospace", letterSpacing: "0.1em" }}>{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* FEATURES */}
-            <section id="feat" className="page-pad" style={{ paddingTop: 44, paddingBottom: 60, maxWidth: 960, margin: "0 auto" }}>
-              <h2 className="section-title" style={{
-                fontWeight: 800, color: "#fff", textAlign: "center",
-                fontFamily: "'Syne',sans-serif", letterSpacing: "-0.03em", marginBottom: 36,
-              }}>
-                What You <span style={{ color: "var(--g)" }}>Get</span>
-              </h2>
-
-              <div className="features-grid">
-                {[
-                  { icon: "🎯", title: "Top 3 Talking Points & Key Facts", desc: "Custom talking points and 3 key facts per contact — walk into every follow-up prepared.", clr: "var(--g)" },
-                  { icon: "🔍", title: "Win-Win Action Items", desc: "Analyzes WhatsApp chats + LinkedIn to surface what they care about & collab opportunities.", clr: "var(--g2)" },
-                  { icon: "✍️", title: "Follow-Ups In Your Voice", desc: "Drafts personalized messages that sound like you — built from your own messaging patterns.", clr: "var(--g)" },
-                  { icon: "📅", title: "1-Click Scheduling", desc: "Auto-schedules follow-up meetings. Save hours/week by automating the boring parts.", clr: "var(--g2)" },
-                ].map((f, i) => (
-                  <div key={i} style={{
-                    background: "var(--card)", border: "1px solid var(--bdr)",
-                    borderRadius: 10, padding: "28px 24px",
-                    animation: `fadeUp 0.5s ease ${i * 0.07}s both`,
-                    transition: "border-color .3s, transform .2s", cursor: "default",
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = f.clr; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--bdr)"; e.currentTarget.style.transform = "none"; }}>
-                    <div style={{ fontSize: 32, marginBottom: 14 }}>{f.icon}</div>
-                    <h3 className="feat-title" style={{ fontWeight: 800, color: "#fff", marginBottom: 10, fontFamily: "'Syne',sans-serif", letterSpacing: "-0.02em" }}>{f.title}</h3>
-                    <p style={{ fontSize: 15, color: "#888", lineHeight: 1.7, fontFamily: "'Manrope',sans-serif" }}>{f.desc}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ textAlign: "center", marginTop: 50 }}>
-                <p style={{ fontSize: 24, fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", letterSpacing: "-0.02em", marginBottom: 8 }}>
-                  Make more connections that matter.
-                </p>
-                <p style={{ fontSize: 16, color: "var(--g)", fontWeight: 600, marginBottom: 28, fontFamily: "'Manrope',sans-serif" }}>
-                  Voice-to-output for busy people · 100% Free to Start
-                </p>
-                <button className="cta" onClick={() => setScreen("input")}>GET STARTED FREE →</button>
-              </div>
-            </section>
-          </div>
-        )}
-
-        {/* INPUT */}
-        {screen === "input" && (
-          <div className="page-pad" style={{ maxWidth: 800, margin: "0 auto", paddingTop: 40, paddingBottom: 70, animation: "fadeUp 0.5s ease" }}>
-
-            <div className="steps-row" style={{ alignItems: "center", gap: 6, marginBottom: 36 }}>
-              {["Upload Chat", "Add LinkedIn", "Get Results"].map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <div style={{
-                    width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
-                    background: i === 0 ? "var(--g)" : i === 1 ? "var(--gd)" : "rgba(255,255,255,0.04)",
-                    color: i === 0 ? "#0a0a0a" : i === 1 ? "var(--g)" : "#555",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 14, fontWeight: 800, fontFamily: "'Syne',sans-serif",
-                    border: i === 1 ? "1.5px solid rgba(0,230,118,0.3)" : "none",
-                  }}>{i + 1}</div>
-                  <span style={{ fontSize: 14, fontWeight: i <= 1 ? 700 : 400, color: i <= 1 ? "#fff" : "#555", fontFamily: "'Manrope',sans-serif", whiteSpace: "nowrap" }}>{s}</span>
-                  {i < 2 && <div style={{ width: 28, height: 1.5, background: i === 0 ? "var(--g)" : "var(--bdr)", margin: "0 2px", flexShrink: 0 }} />}
-                </div>
-              ))}
-            </div>
-
-            {/* WhatsApp */}
-            <div className="input-section" style={{ background: "var(--card)", border: "1px solid var(--bdr)", borderRadius: 12, marginBottom: 20 }}>
-              <h2 className="input-h" style={{ fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", letterSpacing: "-0.02em", marginBottom: 8 }}>
-                💬 Paste Your WhatsApp Chat
-              </h2>
-              <p style={{ fontSize: 15, color: "#777", fontFamily: "'Manrope',sans-serif", lineHeight: 1.55, marginBottom: 18 }}>
-                Export any WhatsApp conversation as .txt and paste below. We extract contacts + context automatically.
-              </p>
-              <button onClick={() => setChatText(SAMPLE_WHATSAPP)} style={{
-                background: "var(--gd)", border: "1px solid rgba(0,230,118,0.22)",
-                color: "var(--g)", borderRadius: 6, padding: "10px 20px",
-                fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 14,
-                fontFamily: "'Manrope',sans-serif",
-              }}>▸ Load Sample Chat (AI Summit Demo)</button>
-              <textarea className="inp" value={chatText} onChange={e => setChatText(e.target.value)}
-                placeholder="Paste your WhatsApp .txt export here..."
-                style={{ height: 180, resize: "vertical", fontFamily: "'Space Mono',monospace", fontSize: 12, lineHeight: 1.85, borderRadius: 8 }} />
-              {chatText && <div style={{ marginTop: 10, fontSize: 13, color: "var(--g)", fontFamily: "'Space Mono',monospace" }}>✓ {chatText.split("\n").filter(l => l.trim()).length} messages loaded</div>}
-            </div>
-
-            {/* LinkedIn */}
-            <div className="input-section" style={{ background: "var(--card)", border: "1px solid var(--bdr)", borderRadius: 12, marginBottom: 28 }}>
-              <h2 className="input-h" style={{ fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", letterSpacing: "-0.02em", marginBottom: 8 }}>
-                🔗 Add LinkedIn Context
-              </h2>
-              <p style={{ fontSize: 15, color: "#777", fontFamily: "'Manrope',sans-serif", marginBottom: 18 }}>
-                Optional — enrich contacts with LinkedIn data for better results.
-              </p>
-              {liRows.map((r, i) => (
-                <div key={i} className="li-grid" style={{ marginBottom: 10 }}>
-                  {[["name","Name"],["role","Role"],["company","Company"],["url","LinkedIn URL"]].map(([f,ph]) => (
-                    <input key={f} className="inp" placeholder={ph} value={r[f]} onChange={e => uLi(i,f,e.target.value)} style={{ padding: "12px 14px", fontSize: 14 }} />
-                  ))}
-                </div>
-              ))}
-              <button onClick={() => setLiRows([...liRows, { name:"", role:"", company:"", url:"" }])} style={{
-                background: "none", border: "1.5px dashed rgba(255,255,255,0.1)",
-                color: "#555", borderRadius: 8, padding: "10px 18px",
-                fontSize: 14, cursor: "pointer", fontFamily: "'Manrope',sans-serif",
-                width: "100%", marginTop: 6, transition: "all .2s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--g)"; e.currentTarget.style.color = "var(--g)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#555"; }}>
-                + Add Another Contact
-              </button>
-            </div>
-
-            <div style={{ textAlign: "center" }}>
-              <button className="cta" onClick={() => { if (chatText) { setScreen("processing"); setTimeout(runN8nPipeline, 400); }}}
-                style={{ opacity: chatText ? 1 : 0.35, cursor: chatText ? "pointer" : "default" }}>
-                🚀 RUN LEVELUP PIPELINE
-              </button>
-              {!chatText && <p style={{ marginTop: 12, fontSize: 14, color: "#555", fontFamily: "'Manrope',sans-serif" }}>Paste or load a chat to get started</p>}
-            </div>
-          </div>
-        )}
-
-        {/* PROCESSING */}
-        {screen === "processing" && (
-          <div className="page-pad" style={{ maxWidth: 720, margin: "0 auto", paddingTop: 70, paddingBottom: 70, textAlign: "center", animation: "fadeIn 0.4s ease" }}>
-            <h2 className="process-title" style={{ fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", letterSpacing: "-0.03em", marginBottom: 10 }}>
-              Agents <span style={{ color: "var(--g)" }}>Working</span>...
-            </h2>
-            <p style={{ fontSize: 16, color: "#777", marginBottom: 44, fontFamily: "'Manrope',sans-serif" }}>
-              3-agent pipeline analyzing your conversations
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14, textAlign: "left" }}>
-              {[
-                { label: "AGENT 1 — EXTRACTOR", desc: "Parsing contacts, roles, context, and sentiment", icon: "🔍" },
-                { label: "AGENT 2 — VOICE WRITER", desc: "Drafting personalized messages in your voice", icon: "✍️" },
-                { label: "AGENT 3 — SYNTHESIZER", desc: "Generating talking points, action items & scheduling", icon: "⚡" },
-              ].map((a, i) => {
-                const on = agentStep === i, done = agentStep > i;
-                return (
-                  <div key={i} style={{
-                    background: done ? "rgba(0,230,118,0.04)" : on ? "rgba(0,230,118,0.025)" : "var(--card)",
-                    border: `1.5px solid ${done ? "rgba(0,230,118,0.22)" : on ? "rgba(0,230,118,0.14)" : "var(--bdr)"}`,
-                    borderRadius: 10, padding: "22px 22px", transition: "all .5s",
-                    opacity: agentStep >= i ? 1 : 0.25, animation: on ? "glow 2s ease infinite" : "none",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                      <div style={{ fontSize: 28 }}>{a.icon}</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 16, fontWeight: 800, fontFamily: "'Syne',sans-serif", color: done ? "var(--g)" : on ? "#fff" : "#666", letterSpacing: "0.02em", marginBottom: 2 }}>{a.label}</div>
-                        <div style={{ fontSize: 13, color: done ? "rgba(0,230,118,0.6)" : "#777", fontFamily: "'Manrope',sans-serif" }}>{a.desc}</div>
-                      </div>
-                      <div style={{ fontSize: 20, flexShrink: 0 }}>
-                        {done ? "✅" : on ? <div style={{ width: 20, height: 20, borderRadius: "50%", border: "2.5px solid var(--g)", borderTopColor: "transparent", animation: "spin .7s linear infinite" }} /> : "○"}
-                      </div>
-                    </div>
-                    {on && (
-                      <div style={{ marginTop: 12, height: 3, borderRadius: 3, background: "rgba(0,230,118,0.08)", overflow: "hidden", position: "relative" }}>
-                        <div style={{ position: "absolute", inset: 0, width: "35%", background: "linear-gradient(90deg,transparent,var(--g),transparent)", animation: "scan 1.4s ease infinite" }} />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* RESULTS */}
-        {screen === "results" && (
-          <div className="page-pad" style={{ maxWidth: 900, margin: "0 auto", paddingTop: 36, paddingBottom: 70, animation: "fadeUp 0.5s ease" }}>
-
-            <div style={{
-              background: "linear-gradient(135deg,rgba(0,230,118,0.06),rgba(0,200,83,0.04))",
-              border: "1px solid rgba(0,230,118,0.18)", borderRadius: 10,
-              padding: "18px 22px", marginBottom: 26,
-            }}>
-              <span style={{ fontSize: 18, fontWeight: 800, color: "var(--g)", fontFamily: "'Syne',sans-serif" }}>✓ PIPELINE COMPLETE </span>
-              <span style={{ fontSize: 13, color: "#888", fontFamily: "'Manrope',sans-serif" }}>— {results.length} contact{results.length !== 1 ? "s" : ""} · {results.reduce((s, c) => s + (c.talkingPoints?.length || 0), 0)} talking points · {results.reduce((s, c) => s + (c.keyFacts?.length || 0), 0)} key facts · {results.reduce((s, c) => s + (c.actionItems?.length || 0), 0)} action items · {results.length} message{results.length !== 1 ? "s" : ""}</span>
-            </div>
-
-            {/* Contact tabs */}
-            <div className="contact-tabs" style={{ marginBottom: 24 }}>
-              {results.map((c, i) => (
-                <button key={i} onClick={() => setActive(i)} style={{
-                  flex: 1, padding: "16px 18px", textAlign: "left",
-                  background: active === i ? "var(--gd)" : "var(--card)",
-                  border: `2px solid ${active === i ? "var(--g)" : "var(--bdr)"}`,
-                  borderRadius: 10, cursor: "pointer", transition: "all .2s",
-                }}>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: active === i ? "var(--g)" : "#fff", fontFamily: "'Syne',sans-serif" }}>{c.name}</div>
-                  <div style={{ fontSize: 13, color: active === i ? "rgba(0,230,118,0.6)" : "#777", fontFamily: "'Manrope',sans-serif", marginTop: 2 }}>{c.role} @ {c.company}</div>
-                  <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 10, padding: "3px 9px", borderRadius: 4, background: "var(--gd)", color: "var(--g)", fontWeight: 700, fontFamily: "'Space Mono',monospace" }}>{c.priority}</span>
-                    <span style={{ fontSize: 10, padding: "3px 9px", borderRadius: 4, background: "var(--g2d)", color: "var(--g2)", fontWeight: 700, fontFamily: "'Space Mono',monospace" }}>{c.sentiment}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {(() => {
-              const c = results[active];
-              return (
-                <div key={active} style={{ animation: "fadeIn 0.3s ease" }}>
-                  {/* Source attribution line */}
-                  <div style={{
-                    marginBottom: 18, padding: "12px 16px",
-                    background: "var(--card)", border: "1px solid var(--bdr)", borderRadius: 8,
-                    fontSize: 13, color: "#888", fontFamily: "'Manrope',sans-serif", lineHeight: 1.7,
-                  }}>
-                    <span style={{ fontWeight: 700, color: "#ccc" }}>{c.name}</span>
-                    <span style={{ color: "#555" }}> — {c.role}, {c.company}</span>
-                    <br />
-                    <span style={{ color: "#666" }}>Analysis based on: </span>
-                    {(() => {
-                      const platformInfo = { linkedin: { icon: "🔗", label: "LinkedIn" }, x: { icon: "𝕏", label: "X" }, instagram: { icon: "📷", label: "Instagram" }, whatsapp: { icon: "💬", label: "WhatsApp" }, web: { icon: "🌐", label: "Web Search" } };
-                      const srcs = c.sources && c.sources.length > 0
-                        ? c.sources
-                        : [...new Map(
-                            [...(c.talkingPoints || []), ...(c.keyFacts || []), ...(c.actionItems || [])]
-                              .filter(item => typeof item === "object" && item?.platform)
-                              .map(item => [item.platform, { platform: item.platform, url: item.source }])
-                          ).values()];
-                      return srcs.map((s, si) => {
-                        const p = platformInfo[s.platform];
-                        if (!p) return null;
-                        return (
-                          <span key={si}>
-                            {si > 0 && <span style={{ color: "#444", margin: "0 6px" }}>·</span>}
-                            {s.url ? (
-                              <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--g)", textDecoration: "none", fontWeight: 600, transition: "opacity .2s" }}>
-                                {p.icon} {p.label}
-                              </a>
-                            ) : (
-                              <span style={{ color: "#777", fontWeight: 600 }}>{p.icon} {p.label}</span>
-                            )}
-                          </span>
-                        );
-                      });
-                    })()}
-                    <span style={{ color: "#555", fontSize: 12, marginLeft: 4 }}> where available</span>
-                    <span style={{ color: "#444", fontSize: 11, fontStyle: "italic" }}> (greater access available for Premium users)</span>
-                  </div>
-
-                  <div className="results-3col" style={{ marginBottom: 22 }}>
-                    {[
-                      { title: "🎯 TOP 3 TALKING POINTS", items: c.talkingPoints, clr: "var(--g)", blr: "rgba(0,230,118,0.16)" },
-                      { title: "💡 3 KEY FACTS", items: c.keyFacts, clr: "var(--g2)", blr: "rgba(0,200,83,0.16)" },
-                      { title: "⚡ ACTION ITEMS", items: c.actionItems, clr: "var(--g)", blr: "rgba(0,230,118,0.16)" },
-                    ].map((sec, si) => (
-                      <div key={si} style={{
-                        background: "var(--card)", border: "1px solid var(--bdr)",
-                        borderRadius: 10, padding: "22px 18px",
-                        borderTop: `3px solid ${sec.clr}`,
-                      }}>
-                        <h3 style={{ fontSize: 12, fontWeight: 800, color: sec.clr, fontFamily: "'Syne',sans-serif", letterSpacing: "0.04em", marginBottom: 16 }}>{sec.title}</h3>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                          {sec.items.map((item, ii) => {
-                            const isObj = typeof item === "object" && item !== null;
-                            const text = isObj ? item.text : item;
-                            const platform = isObj ? item.platform : null;
-                            const source = isObj ? item.source : null;
-                            const badges = { linkedin: { label: "LI", bg: "rgba(0,119,181,0.15)", color: "#0077B5" }, x: { label: "X", bg: "rgba(255,255,255,0.08)", color: "#aaa" }, instagram: { label: "IG", bg: "rgba(225,48,108,0.15)", color: "#E1306C" }, whatsapp: { label: "WA", bg: "rgba(37,211,102,0.15)", color: "#25D366" }, web: { label: "Web", bg: "rgba(66,133,244,0.15)", color: "#4285F4" } };
-                            const badge = platform && badges[platform];
-                            return (
-                              <div key={ii} style={{
-                                fontSize: 14, color: "#ccc", lineHeight: 1.6,
-                                fontFamily: "'Manrope',sans-serif", paddingLeft: 14,
-                                borderLeft: `2px solid ${sec.blr}`,
-                                display: "flex", alignItems: "flex-start", gap: 8,
-                              }}>
-                                <span style={{ flex: 1 }}>{text}</span>
-                                {badge && (
-                                  source ? (
-                                    <a href={source} target="_blank" rel="noopener noreferrer" style={{
-                                      fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 3,
-                                      background: badge.bg, color: badge.color, textDecoration: "none",
-                                      fontFamily: "'Space Mono',monospace", letterSpacing: "0.04em",
-                                      flexShrink: 0, marginTop: 3, transition: "opacity .2s",
-                                    }}>{badge.label}</a>
-                                  ) : (
-                                    <span style={{
-                                      fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 3,
-                                      background: badge.bg, color: badge.color,
-                                      fontFamily: "'Space Mono',monospace", letterSpacing: "0.04em",
-                                      flexShrink: 0, marginTop: 3, opacity: 0.7,
-                                    }}>{badge.label}</span>
-                                  )
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Message */}
-                  <div style={{ background: "var(--card)", border: "1px solid var(--bdr)", borderRadius: 10, padding: "24px 22px", marginBottom: 14 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                      <h3 style={{ fontSize: 20, fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", letterSpacing: "-0.02em" }}>✍️ DRAFTED FOLLOW-UP</h3>
-                      <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 4, background: "rgba(255,255,255,0.05)", color: "#888", fontFamily: "'Space Mono',monospace" }}>Tone: {c.tone}</span>
-                    </div>
-                    <div style={{
-                      background: "rgba(0,0,0,0.3)", border: "1px solid rgba(0,230,118,0.08)",
-                      borderRadius: 8, padding: "20px 20px",
-                      fontSize: 15, color: "#ddd", lineHeight: 1.8,
-                      fontFamily: "'Manrope',sans-serif", whiteSpace: "pre-line", marginBottom: 18,
-                    }}>{c.draftMessage}</div>
-                    <div className="msg-btns">
-                      <button className="cta" style={{ padding: "14px 26px", fontSize: 14 }}
-                        onClick={() => { setCopied(active); setTimeout(() => setCopied(-1), 2500); }}>
-                        {copied === active ? "✓ COPIED!" : "📋 COPY MESSAGE"}
-                      </button>
-                      <button className="cta2" style={{ padding: "14px 26px", fontSize: 14 }}>📅 SCHEDULE FOLLOW-UP</button>
-                      <button className="cta-o" style={{ padding: "12px 22px", fontSize: 13 }}>✏️ EDIT & REGENERATE</button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* FEEDBACK */}
-            <div style={{
-              marginTop: 40, textAlign: "center", padding: "36px 24px",
-              background: "linear-gradient(135deg,rgba(0,200,83,0.035),rgba(0,230,118,0.03))",
-              border: "1px solid rgba(0,230,118,0.12)", borderRadius: 12,
-            }}>
-              {fbDone ? (
-                <div>
-                  <div style={{ fontSize: 44, marginBottom: 12 }}>🎉</div>
-                  <h3 style={{ fontSize: 24, fontWeight: 800, color: "var(--g)", fontFamily: "'Syne',sans-serif", marginBottom: 6 }}>Thanks for your feedback!</h3>
-                  <p style={{ fontSize: 15, color: "#888", fontFamily: "'Manrope',sans-serif" }}>Your input directly shapes what we build next.</p>
-                </div>
-              ) : (
-                <div>
-                  <h3 style={{ fontSize: 26, fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", letterSpacing: "-0.02em", marginBottom: 8 }}>How'd It Go?</h3>
-                  <p style={{ fontSize: 15, color: "#888", marginBottom: 28, fontFamily: "'Manrope',sans-serif" }}>30 seconds — help us build what you need.</p>
-                  <div className="fb-grid" style={{ display: "flex", flexDirection: "column", gap: 24, margin: "0 auto", textAlign: "left" }}>
-                    <div>
-                      <label style={{ display: "block", fontSize: 15, fontWeight: 700, color: "#ddd", marginBottom: 10, fontFamily: "'Manrope',sans-serif" }}>How useful is this?</label>
-                      <div style={{ display: "flex", gap: 8 }}>
-                        {[1,2,3,4,5].map(n => (
-                          <button key={n} onClick={() => setFbR(n)} style={{
-                            width: 50, height: 50, borderRadius: 6,
-                            border: `2px solid ${fbR >= n ? "var(--g)" : "var(--bdr)"}`,
-                            background: fbR >= n ? "var(--gd)" : "var(--card)",
-                            color: fbR >= n ? "var(--g)" : "#555",
-                            fontSize: 20, fontWeight: 800, cursor: "pointer",
-                            fontFamily: "'Syne',sans-serif", transition: "all .15s",
-                          }}>{n}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label style={{ display: "block", fontSize: 15, fontWeight: 700, color: "#ddd", marginBottom: 10, fontFamily: "'Manrope',sans-serif" }}>What would you pay?</label>
-                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                        {["$6/mo","$29/3mo","$49/3mo","Not yet"].map(p => (
-                          <button key={p} onClick={() => setFbP(p)} style={{
-                            padding: "10px 20px", borderRadius: 6,
-                            border: `2px solid ${fbP === p ? "var(--g2)" : "var(--bdr)"}`,
-                            background: fbP === p ? "var(--g2d)" : "var(--card)",
-                            color: fbP === p ? "var(--g2)" : "#888",
-                            fontSize: 14, fontWeight: 700, cursor: "pointer",
-                            fontFamily: "'Manrope',sans-serif", transition: "all .15s",
-                          }}>{p}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label style={{ display: "block", fontSize: 15, fontWeight: 700, color: "#ddd", marginBottom: 10, fontFamily: "'Manrope',sans-serif" }}>What would make this indispensable?</label>
-                      <textarea className="inp" value={fbT} onChange={e => setFbT(e.target.value)}
-                        placeholder="What would you keep using it for? What's missing?"
-                        style={{ height: 85, resize: "vertical", fontFamily: "'Manrope',sans-serif", fontSize: 14, borderRadius: 8 }} />
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                      <button className="cta" onClick={() => setFbDone(true)} style={{ fontSize: 15 }}>SUBMIT FEEDBACK</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+      <div class="radio-item selected" onclick="selectRadio(this)">
+        <div class="option-icon">😔</div>
+        <div class="option-text">Almost always — most connections fade</div>
+        <div class="radio-dot"></div>
+      </div>
+      <div class="radio-item" onclick="selectRadio(this)">
+        <div class="option-icon">🤷</div>
+        <div class="option-text">About half — I follow up on the "important" ones</div>
+        <div class="radio-dot"></div>
+      </div>
+      <div class="radio-item" onclick="selectRadio(this)">
+        <div class="option-icon">✅</div>
+        <div class="option-text">Rarely — but follow-ups still feel like effort</div>
+        <div class="radio-dot"></div>
       </div>
     </div>
-  );
+  </div>
+  <div class="sticky-bottom">
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo(0)">← Back</button>
+      <button class="btn-primary" style="flex:2" onclick="goTo(2)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 2: Q3 ===== -->
+<div class="screen hidden" id="s2">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="survey-card" style="margin-top:20px">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:71%"></div></div>
+      <div class="q-label">Question 3 of 3</div>
+      <div class="q-text">How do you currently manage new contacts after meeting?</div>
+      <div class="q-hint">Select all that apply</div>
+
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">📱</div>
+        <div class="option-text">WhatsApp — they're in my chats</div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">💼</div>
+        <div class="option-text">LinkedIn — I connect and forget</div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">📊</div>
+        <div class="option-text">CRM / spreadsheet</div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">🧠</div>
+        <div class="option-text">Memory — I try to remember</div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sticky-bottom">
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo(1)">← Back</button>
+      <button class="btn-primary" style="flex:2" onclick="goTo(3)">See My Score →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 3: SCORE ===== -->
+<div class="screen hidden" id="s3">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="score-card fade-up fade-up-1">
+      <div class="score-badge">AI Automation Readiness</div>
+      <div class="score-num">87</div>
+      <div class="score-label">High-Impact Candidate</div>
+      <div class="progress-pill"><div class="progress-pill-fill"></div></div>
+      <div class="score-desc" style="margin-top:12px">Based on your responses — you're leaving serious time and opportunity on the table.</div>
+    </div>
+
+    <div class="time-card fade-up fade-up-2">
+      <div class="time-label">⏱ Estimated time you could save</div>
+      <div class="time-num">6<span>hrs</span></div>
+      <div class="time-sub">per week — back in your hands</div>
+      <div class="time-divider"></div>
+      <span class="time-tag">~2 hrs researching contacts</span>
+      <span class="time-tag">~2 hrs writing follow-ups</span>
+      <span class="time-tag">~1 hr scheduling</span>
+      <span class="time-tag">~1 hr chasing dropped balls</span>
+    </div>
+
+    <div class="email-section fade-up fade-up-3">
+      <div style="font-size:24px;margin-bottom:10px">📊</div>
+      <div class="email-title">Get Your Full AI Automation Readiness Report</div>
+      <div class="email-desc">A personalized breakdown of where AI can save you the most time — plus instant access to your free Relationship Intelligence Agent.</div>
+      <input class="email-input" type="email" placeholder="your@email.com" id="emailInput">
+      <button class="btn-primary" onclick="goTo(4)">✉️ &nbsp;Send My Report + Unlock Free Agent</button>
+      <div class="fine-print">No spam. Unsubscribe anytime. Your agent is ready immediately after.</div>
+    </div>
+    <div class="skip-link"><a onclick="goTo(4)">Already have access? Skip → Build My Agent Now</a></div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 4: CHANNEL SELECT ===== -->
+<div class="screen hidden" id="s4">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div style="margin-top:24px">
+      <div class="hero-tag" style="margin-top:0">Set Up Your Agent</div>
+      <h1 class="hero" style="font-size:28px">How does your business<br><span class="accent">connect & close?</span></h1>
+      <p class="hero-sub">Choose your primary channel. LevelUp's 5 agents will calibrate to how you actually work.</p>
+
+      <div class="channel-grid">
+        <div class="channel-card selected" id="ch-wa" onclick="selectChannel('wa')">
+          <div class="channel-icon">💬</div>
+          <div class="channel-name">WhatsApp</div>
+          <div class="channel-desc">Chat history + contacts → instant intel</div>
+        </div>
+        <div class="channel-card" id="ch-li" onclick="selectChannel('li')">
+          <div class="channel-icon">💼</div>
+          <div class="channel-name">LinkedIn</div>
+          <div class="channel-desc">Profile URL → research + pitch angles</div>
+        </div>
+        <div class="channel-card" id="ch-ig" onclick="selectChannel('ig')">
+          <div class="channel-icon">📸</div>
+          <div class="channel-name">Instagram</div>
+          <div class="channel-desc">DMs + profile → collab intelligence</div>
+        </div>
+        <div class="channel-card" id="ch-csv" onclick="selectChannel('csv')">
+          <div class="channel-icon">📊</div>
+          <div class="channel-name">CRM / CSV</div>
+          <div class="channel-desc">Import contacts → bulk analysis</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.5">
+        ✦ <strong style="color:var(--lu)">WhatsApp-first</strong> selected — LevelUp will use your chat history as the primary relationship signal, enriched with LinkedIn + web via Hybrid RAG.
+      </div>
+    </div>
+  </div>
+  <div class="sticky-bottom">
+    <button class="btn-lu" onclick="goTo(5)">Continue with WhatsApp →</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN 5: INPUT ===== -->
+<div class="screen hidden" id="s5">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div style="margin-top:20px">
+      <div class="hero-tag" style="margin-top:0;margin-bottom:14px">Analyze a Contact</div>
+
+      <div class="input-label">WhatsApp Chat History</div>
+      <div class="sample-btn" onclick="loadSample()">✦ Load sample conversation</div>
+      <textarea class="wa-input" id="waText" placeholder="Paste your WhatsApp export here...&#10;&#10;[12/03/25, 3:42 PM] Sarah: Great meeting you at SaaStr!&#10;[12/03/25, 3:44 PM] You: Loved your talk on founder-led sales..."></textarea>
+      <div class="input-hint">
+        📱 <strong style="color:var(--text)">Export from WhatsApp:</strong> Open chat → ⋯ → More → Export Chat (without media)<br><br>
+        <a href="#">Install PWA</a> to share directly from WhatsApp in 1 tap ↗
+      </div>
+
+      <div class="input-label">LinkedIn URL or Website</div>
+      <input class="text-input" type="text" placeholder="linkedin.com/in/... or company.com" id="linkedinUrl">
+      <div class="input-hint">💡 LinkedIn or website — LevelUp's Exploratory Agent researches the rest via Hybrid RAG</div>
+
+      <div class="input-label">Contact Name</div>
+      <input class="text-input" type="text" placeholder="e.g. Sarah Chen" id="contactName">
+
+      <div class="input-label">Title</div>
+      <input class="text-input" type="text" placeholder="e.g. Head of Partnerships" id="contactTitle">
+
+      <div class="input-label">Company</div>
+      <input class="text-input" type="text" placeholder="e.g. Sequoia Capital" id="contactCompany">
+
+      <div class="input-label">Scheduling preference</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <div class="tone-chip selected" onclick="toggleChip(this,'sched')">📅 Google Cal</div>
+        <div class="tone-chip" onclick="toggleChip(this,'sched')">📅 Calendly</div>
+        <div class="tone-chip" onclick="toggleChip(this,'sched')">💬 WhatsApp</div>
+        <div class="tone-chip" onclick="toggleChip(this,'sched')">🎥 Zoom</div>
+      </div>
+    </div>
+  </div>
+  <div class="sticky-bottom">
+    <button class="btn-lu" onclick="startAnalysis()">✦ Generate Intelligence →</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN 6: LOADING ===== -->
+<div class="screen hidden" id="s6">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+    </div>
+  </div>
+  <div class="scroll-content" style="display:flex;flex-direction:column;justify-content:center;min-height:70vh">
+    <div class="loading-ring"></div>
+    <div class="loading-title">Building your<br>Relationship Agent</div>
+    <div class="loading-sub">Personalizing based on your responses...</div>
+    <div class="loading-steps">
+      <div class="loading-step" id="lsrow0">
+        <div class="agent-icon" id="lai0">🔭</div>
+        <div>
+          <div class="agent-name" id="ls0">Exploratory Agent</div>
+          <div class="agent-desc" id="lsd0">Researching <span id="lsName">Sarah Chen</span> — LinkedIn + web signals</div>
+        </div>
+        <div class="agent-status" id="lss0"></div>
+      </div>
+      <div class="loading-step" id="lsrow1">
+        <div class="agent-icon" id="lai1">📊</div>
+        <div>
+          <div class="agent-name" id="ls1">RAG Agent</div>
+          <div class="agent-desc" id="lsd1">Hybrid RAG pipeline — extracting top key facts</div>
+        </div>
+        <div class="agent-status" id="lss1"></div>
+      </div>
+      <div class="loading-step" id="lsrow2">
+        <div class="agent-icon" id="lai2">💡</div>
+        <div>
+          <div class="agent-name" id="ls2">Outreach Agent</div>
+          <div class="agent-desc" id="lsd2">Generating talking points + collaboration angles</div>
+        </div>
+        <div class="agent-status" id="lss2"></div>
+      </div>
+      <div class="loading-step" id="lsrow3">
+        <div class="agent-icon" id="lai3">🎙️</div>
+        <div>
+          <div class="agent-name" id="ls3">Voice Agent</div>
+          <div class="agent-desc" id="lsd3">Drafting follow-up in your voice + tone</div>
+        </div>
+        <div class="agent-status" id="lss3"></div>
+      </div>
+      <div class="loading-step" id="lsrow4">
+        <div class="agent-icon" id="lai4">📅</div>
+        <div>
+          <div class="agent-name" id="ls4">Scheduling Agent</div>
+          <div class="agent-desc" id="lsd4">Optimizing timing + calendar hooks</div>
+        </div>
+        <div class="agent-status" id="lss4"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 7: OUTPUT ===== -->
+<div class="screen hidden" id="s7">
+  <div class="top-bar">
+    <div class="logo">LevelUp<span>.ai</span></div>
+    <div class="progress-dots">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+
+    <div class="usage-bar fade-up fade-up-1">
+      <div class="usage-dot"></div>
+      <div class="usage-text">⚡ <strong>1 of 3</strong> free contacts used</div>
+      <div class="tier-badge">Free Tier</div>
+    </div>
+
+    <div class="section-head fade-up fade-up-1">
+      <div class="section-icon">👤</div>
+      <div class="section-title">Contact Detected</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="contact-card fade-up fade-up-2">
+      <div class="contact-avatar">👩</div>
+      <div>
+        <div class="contact-name" id="outName">Sarah Chen</div>
+        <div class="contact-role">Head of Partnerships · Sequoia Capital · Met at SaaStr 2025</div>
+      </div>
+      <div class="new-badge">New ✓</div>
+    </div>
+
+    <div class="section-head fade-up fade-up-2">
+      <div class="section-icon">🔍</div>
+      <div class="section-title">Top 3 Key Facts</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="facts-card fade-up fade-up-3">
+      <div class="fact-item">
+        <div class="fact-num">1</div>
+        <div class="fact-text">Led Sequoia's $50M Series B into Rippling — deep expertise in HR-tech and workforce automation at SMB scale.</div>
+        <div class="source-pills"><span class="src-pill">💼 LinkedIn</span><span class="src-pill">🌐 Sequoia Portfolio</span></div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">2</div>
+        <div class="fact-text">Co-hosts "Operators Only" podcast — 40k listeners, B2B SaaS GTM focus. Actively seeking founder guests.</div>
+        <div class="source-pills"><span class="src-pill">🎙️ Spotify</span><span class="src-pill">📝 LinkedIn Posts</span></div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">3</div>
+        <div class="fact-text">Travels to NYC monthly for LP meetings — mentioned at SaaStr. Good window for in-person coffee this month.</div>
+        <div class="source-pills"><span class="src-pill">📍 LinkedIn Activity</span><span class="src-pill">🎤 SaaStr Profile</span></div>
+      </div>
+    </div>
+
+    <div class="section-head fade-up fade-up-3">
+      <div class="section-icon">💡</div>
+      <div class="section-title">Top 3 Talking Points</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="talking-card fade-up fade-up-4">
+      <div class="tp-label"><div class="tp-num">1</div> Shared Thesis</div>
+      <div class="tp-text">Reference her Rippling investment — segue into how LevelUp automates the relationship intelligence layer she's backing at SMB scale.</div>
+      <div class="tp-quote">
+        <div class="tp-quote-text">💬 "Loved your take on founder-led sales at SaaStr — it maps directly to what we're seeing with SMBs automating outreach..."</div>
+      </div>
+    </div>
+    <div class="talking-card fade-up fade-up-4">
+      <div class="tp-label"><div class="tp-num">2</div> Podcast Angle</div>
+      <div class="tp-text">Offer to be a guest on Operators Only — your product is exactly the GTM tool her B2B operator audience wants to hear about now.</div>
+      <div class="tp-quote">
+        <div class="tp-quote-text">💬 "Your PLG vs. sales-led episode was spot on — would love to share what we're seeing with AI-native networking tools..."</div>
+      </div>
+    </div>
+    <div class="talking-card fade-up fade-up-5">
+      <div class="tp-label"><div class="tp-num">3</div> Timing Hook</div>
+      <div class="tp-text">Use her NYC travel pattern for a specific in-person ask — specificity beats vague "let's connect" every time.</div>
+      <div class="tp-quote">
+        <div class="tp-quote-text">💬 "Are you in NYC this month? I'll be there the 18th–20th — coffee at Bluestone would be great..."</div>
+      </div>
+    </div>
+
+    <div class="section-head fade-up fade-up-4">
+      <div class="section-icon">✅</div>
+      <div class="section-title">Action Items from Chat</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="action-item fade-up fade-up-4">
+      <div class="action-check"></div>
+      <div>
+        <div class="action-text">Send Sarah the LevelUp demo link she asked for at SaaStr</div>
+        <div class="action-meta">💬 WhatsApp · 3 days ago · High priority</div>
+      </div>
+    </div>
+    <div class="action-item fade-up fade-up-5">
+      <div class="action-check"></div>
+      <div>
+        <div class="action-text">Intro Sarah to Marcus Webb at a16z re: AI infrastructure portfolio</div>
+        <div class="action-meta">💬 WhatsApp · 3 days ago</div>
+      </div>
+    </div>
+
+    <div class="section-head fade-up fade-up-5">
+      <div class="section-icon">✍️</div>
+      <div class="section-title">Your Follow-Up Message</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="draft-card fade-up fade-up-5">
+      <div class="draft-label">💬 Draft Message</div>
+      <div class="draft-text" id="draftText">Hey Sarah — really enjoyed our conversation at SaaStr about founder-led sales. Your point about operators being undervalued in PLG companies stuck with me.<br><br>I've been building something that automates the relationship intelligence layer for time-pressed founders — would love to show you how it works, especially given your SMB-AI thesis at Sequoia.<br><br>Are you in NYC in the next few weeks? Happy to meet in person, or grab 20 mins on Zoom. Dropping a Calendly below 📅<br><br>— [Your name]</div>
+    </div>
+
+    <div class="tone-section fade-up fade-up-5">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span style="font-size:18px">🎛️</span>
+        <div class="tone-title">Customize Your Message</div>
+      </div>
+      <div class="tone-sub">Adjust tone or give feedback — voice or text</div>
+      <div class="tone-label">Message Style</div>
+      <div class="tone-chips">
+        <div class="tone-chip selected" onclick="selectTone(this)">Professional</div>
+        <div class="tone-chip" onclick="selectTone(this)">Friendly</div>
+        <div class="tone-chip" onclick="selectTone(this)">Formal</div>
+        <div class="tone-chip" onclick="selectTone(this)">Casual</div>
+        <div class="tone-chip" onclick="selectTone(this)">Conversational</div>
+        <div class="tone-chip" onclick="selectTone(this)">Excited</div>
+        <div class="tone-chip" onclick="selectTone(this)">Concise</div>
+        <div class="tone-chip" onclick="selectTone(this)">Results-Driven</div>
+        <div class="tone-chip" onclick="selectTone(this)">Warm</div>
+        <div class="tone-chip" onclick="selectTone(this)">Direct</div>
+      </div>
+      <div class="tone-label">Additional Feedback</div>
+      <div class="feedback-row">
+        <textarea class="feedback-input" placeholder='e.g. "Lead with the podcast angle and make it shorter"...'></textarea>
+        <div class="mic-btn">🎙️</div>
+      </div>
+      <div class="voice-link" style="margin-bottom:10px">Tap mic to give feedback by voice</div>
+      <button class="btn-regen">✨ Regenerate Message</button>
+    </div>
+
+    <div class="section-head" style="margin-top:24px">
+      <div class="section-icon">📅</div>
+      <div class="section-title">Schedule a Follow-Up</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="sched-grid">
+      <div class="sched-btn">📅 Calendly</div>
+      <div class="sched-btn">📅 Google Cal</div>
+      <div class="sched-btn">💬 WhatsApp</div>
+      <div class="sched-btn">🎥 Zoom</div>
+    </div>
+    <button class="btn-lu" style="margin-top:12px" onclick="sendWA()">✅ Send via WhatsApp</button>
+
+    <!-- PRICING -->
+    <div id="pricing-section" style="margin-top:16px">
+
+      <!-- Header -->
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(212,168,67,0.12);border:1px solid var(--gold-border);border-radius:20px;padding:6px 16px;font-size:11px;font-weight:600;color:var(--gold2);margin-bottom:12px">✦ You're 1 insight away from closing this</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1.2">Unlock the full<br><span style="color:var(--lu)">Relationship Intelligence Agent</span></div>
+      </div>
+
+      <!-- Toggle -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px">
+        <span id="tog-ind" style="font-size:13px;font-weight:600;color:var(--lu);cursor:pointer" onclick="showTiers('individual')">Individual</span>
+        <div id="tog-track" onclick="toggleTierView()" style="width:44px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;cursor:pointer;position:relative;transition:all 0.2s">
+          <div id="tog-thumb" style="width:18px;height:18px;background:var(--lu);border-radius:50%;position:absolute;top:2px;left:3px;transition:all 0.3s"></div>
+        </div>
+        <span id="tog-team" style="font-size:13px;font-weight:600;color:var(--muted);cursor:pointer" onclick="showTiers('team')">Teams</span>
+      </div>
+
+      <!-- INDIVIDUAL TIERS -->
+      <div id="tiers-individual">
+
+        <!-- FREE -->
+        <div class="pricing-card" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Free</div>
+              <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;line-height:1">$0<span style="font-size:13px;font-weight:400;color:var(--muted)">/mo</span></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid var(--faint);border-radius:8px;padding:4px 12px;font-size:11px;color:var(--muted)">Current plan</div>
+          </div>
+          <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text">Unlimited contacts — <strong>30-sec quick analysis</strong></span></div>
+          <div class="pf-row"><span class="pf-icon">💡</span><span class="pf-text">3 talking points per contact</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">Deep Hybrid RAG analysis</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">AI draft in your voice</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">WhatsApp full history analysis</span></div>
+        </div>
+
+        <!-- PRO — FEATURED -->
+        <div class="pricing-card pricing-featured" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="background:var(--grad-gold);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:#000">MOST POPULAR</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold2)">Pro</div>
+          </div>
+
+          <!-- Billing toggle -->
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <div id="bill-mo" class="bill-chip" onclick="setBilling('monthly')">Monthly</div>
+            <div id="bill-qtr" class="bill-chip bill-active" onclick="setBilling('quarterly')">Quarterly <span style="background:rgba(0,230,118,0.2);color:var(--lu);border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px">Save 10%</span></div>
+          </div>
+
+          <div style="margin-bottom:14px">
+            <div id="price-display" style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--lu);line-height:1">$8.99<span id="price-period" style="font-size:14px;font-weight:400;color:var(--muted);-webkit-text-fill-color:var(--muted)">/mo</span></div>
+            <div id="price-sub" style="font-size:11px;color:var(--muted);margin-top:3px">Billed $26.99/quarter · cancel anytime</div>
+          </div>
+
+          <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text"><strong>Unlimited contacts</strong> — full deep analysis</span></div>
+          <div class="pf-row"><span class="pf-icon">🔭</span><span class="pf-text">Exploratory Agent — full web + LinkedIn research</span></div>
+          <div class="pf-row"><span class="pf-icon">📊</span><span class="pf-text">RAG Agent — Top 5 Key Facts (vs 3 on Free)</span></div>
+          <div class="pf-row"><span class="pf-icon">🎙️</span><span class="pf-text">Voice Agent — draft in your voice, 9 tone styles</span></div>
+          <div class="pf-row"><span class="pf-icon">💬</span><span class="pf-text">Full WhatsApp history analysis</span></div>
+          <div class="pf-row"><span class="pf-icon">📅</span><span class="pf-text">Scheduling Agent — Calendly, GCal, Zoom</span></div>
+          <div class="pf-row"><span class="pf-icon">🧠</span><span class="pf-text">Relationship memory — context builds over time</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">CRM sync (Teams+)</span></div>
+
+          <button class="btn-amber" style="margin-top:16px" onclick="alert('Starting free trial...')">⚡ Start Free Trial — No Card Required</button>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">14-day free trial · Less than a coffee ☕</div>
+        </div>
+
+      </div>
+
+      <!-- TEAM TIERS -->
+      <div id="tiers-team" style="display:none">
+
+        <!-- TEAMS -->
+        <div class="pricing-card pricing-featured" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="background:var(--grad-gold);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:#000">TEAMS</div>
+            <div style="font-size:11px;color:var(--muted)">Up to 5 seats</div>
+            <div style="margin-left:auto;font-size:11px;color:var(--lu);font-weight:600">$8/seat</div>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--lu);line-height:1;margin-bottom:4px">$39.99<span style="font-size:14px;font-weight:400;color:var(--muted);-webkit-text-fill-color:var(--muted)">/mo</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Billed monthly · cancel anytime</div>
+
+          <div class="pf-row"><span class="pf-icon">👥</span><span class="pf-text"><strong>5 seats</strong> — shared team workspace</span></div>
+          <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text">Unlimited contacts across all seats</span></div>
+          <div class="pf-row"><span class="pf-icon">📊</span><span class="pf-text">Shared contact library + team analytics</span></div>
+          <div class="pf-row"><span class="pf-icon">🔗</span><span class="pf-text">LinkedIn auto-import of new connections</span></div>
+          <div class="pf-row"><span class="pf-icon">🧠</span><span class="pf-text">Relationship memory per seat</span></div>
+          <div class="pf-row"><span class="pf-icon">🔔</span><span class="pf-text">Proactive nudges when contacts go cold</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">CRM sync — HubSpot, Salesforce (Enterprise)</span></div>
+
+          <button class="btn-lu" style="margin-top:16px" onclick="alert('Starting team trial...')">Start Team Free Trial →</button>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">14-day free trial · No card required</div>
+        </div>
+
+        <!-- ENTERPRISE -->
+        <div class="pricing-card" style="margin-bottom:10px;border-color:var(--gold-border)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="background:rgba(212,168,67,0.15);border:1px solid var(--gold-border);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--gold2)">ENTERPRISE</div>
+            <div style="font-size:11px;color:var(--muted)">10+ seats</div>
+            <div style="margin-left:auto;font-size:11px;color:var(--gold2);font-weight:600">$8/seat</div>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--gold2);line-height:1;margin-bottom:4px">$79.99<span style="font-size:14px;font-weight:400;color:var(--muted)">/mo</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Billed monthly · annual available</div>
+
+          <div class="pf-row"><span class="pf-icon">👥</span><span class="pf-text"><strong>10+ seats</strong> — unlimited scaling</span></div>
+          <div class="pf-row"><span class="pf-icon">📊</span><span class="pf-text">CRM sync — Salesforce, HubSpot, GoHighLevel</span></div>
+          <div class="pf-row"><span class="pf-icon">🔒</span><span class="pf-text">RLS security + SSO + audit logs</span></div>
+          <div class="pf-row"><span class="pf-icon">🌐</span><span class="pf-text">WhatsApp Business API integration</span></div>
+          <div class="pf-row"><span class="pf-icon">⚡</span><span class="pf-text">Zapier webhook — 5,000+ tool integrations</span></div>
+          <div class="pf-row"><span class="pf-icon">🎯</span><span class="pf-text">Dedicated CSM + onboarding + SLA</span></div>
+
+          <button class="btn-amber" style="margin-top:16px" onclick="alert('Contacting sales...')">Contact Sales →</button>
+        </div>
+
+      </div>
+
+      <!-- COMPARE LINK -->
+      <div style="text-align:center;margin-top:6px;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--muted);cursor:pointer" onclick="document.getElementById('compare-table').style.display=document.getElementById('compare-table').style.display==='none'?'block':'none'">▾ Compare all features</span>
+      </div>
+
+      <!-- COMPARE TABLE -->
+      <div id="compare-table" style="display:none;background:var(--bg3);border:1px solid var(--faint);border-radius:16px;overflow:hidden;margin-bottom:10px">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <tr style="border-bottom:1px solid var(--faint)">
+            <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600">Feature</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600">Free</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--lu);font-weight:600">Pro</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--gold2);font-weight:600">Teams</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--gold2);font-weight:600">Ent.</th>
+          </tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Contacts/mo</td><td style="text-align:center;color:var(--muted)">∞ quick</td><td style="text-align:center;color:var(--lu)">∞ deep</td><td style="text-align:center;color:var(--lu)">∞</td><td style="text-align:center;color:var(--lu)">∞</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Hybrid RAG depth</td><td style="text-align:center;color:var(--muted)">30s</td><td style="text-align:center;color:var(--lu)">Full</td><td style="text-align:center;color:var(--lu)">Full</td><td style="text-align:center;color:var(--lu)">Full</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Key Facts</td><td style="text-align:center;color:var(--muted)">3</td><td style="text-align:center;color:var(--lu)">5</td><td style="text-align:center;color:var(--lu)">5</td><td style="text-align:center;color:var(--lu)">5+</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Voice Agent draft</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">WA history analysis</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Team seats</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">5</td><td style="text-align:center;color:var(--lu)">10+</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">CRM sync</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+          <tr><td style="padding:8px 12px;color:var(--text)">SSO + audit logs</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ANALYZE ANOTHER -->
+    <button class="btn-secondary" style="width:100%;margin-top:12px;padding:14px" onclick="goTo(5)">+ Analyze Another Contact</button>
+    <div style="height:40px"></div>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<script>
+let currentScreen = 0;
+
+function goTo(n) {
+  const cur = document.getElementById('s' + currentScreen);
+  const next = document.getElementById('s' + n);
+  if (!next) return;
+  cur.classList.add('exit');
+  setTimeout(() => { cur.classList.remove('exit'); cur.classList.add('hidden'); }, 400);
+  next.classList.remove('hidden');
+  currentScreen = n;
+  if (n === 6) runLoading();
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<VennApp />);
-  </script>
+function toggleOption(el) {
+  el.classList.toggle('selected');
+}
+
+function selectRadio(el) {
+  const siblings = el.parentElement.querySelectorAll('.radio-item');
+  siblings.forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+let selectedChannel = 'wa';
+function selectChannel(ch) {
+  ['wa','li','ig','csv'].forEach(c => {
+    const el = document.getElementById('ch-' + c);
+    if (el) el.classList.remove('selected');
+  });
+  document.getElementById('ch-' + ch).classList.add('selected');
+  selectedChannel = ch;
+  const hint = document.querySelector('#s4 .input-hint-box') || document.querySelector('#s4 div[style*="border-radius:14px"]');
+  const labels = {
+    wa: '✦ <strong style="color:var(--lu)">WhatsApp-first</strong> selected — LevelUp will use your chat history as the primary relationship signal, enriched with LinkedIn + web via Hybrid RAG.',
+    li: '✦ <strong style="color:var(--lu)">LinkedIn-first</strong> selected — LevelUp will research the profile URL and enrich with web data via Hybrid RAG.',
+    ig: '✦ <strong style="color:var(--lu)">Instagram-first</strong> selected — LevelUp will analyze DMs and profile for collab intelligence.',
+    csv: '✦ <strong style="color:var(--lu)">CRM/CSV import</strong> selected — LevelUp will batch-analyze your contacts and push intelligence back to your CRM.'
+  };
+  if (hint) hint.innerHTML = labels[ch];
+  const ctaBtn = document.querySelector('#s4 .btn-lu');
+  const ctaLabels = { wa:'Continue with WhatsApp →', li:'Continue with LinkedIn →', ig:'Continue with Instagram →', csv:'Continue with CSV Import →' };
+  if (ctaBtn) ctaBtn.textContent = ctaLabels[ch];
+}
+
+function selectTone(el) {
+  document.querySelectorAll('#s7 .tone-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleChip(el, group) {
+  el.classList.toggle('selected');
+}
+
+function loadSample() {
+  const wa = document.getElementById('waText');
+  wa.value = `[12/03/25, 3:42 PM] Sarah: Great meeting you at SaaStr! Your demo was 🔥
+[12/03/25, 3:44 PM] You: Loved your talk on founder-led sales — really resonated
+[12/03/25, 3:45 PM] Sarah: Send me the demo link when it's ready?
+[12/03/25, 3:46 PM] You: 100%, will send this week. Also should intro you to Marcus at a16z re AI infra
+[12/03/25, 3:47 PM] Sarah: Yes please! Are you going to be at the NYC LP summit?
+[12/03/25, 3:48 PM] You: I'll be there 18-20. Coffee?
+[12/03/25, 3:49 PM] Sarah: Perfect timing 👌`;
+  document.getElementById('contactName').value = 'Sarah Chen';
+  document.getElementById('linkedinUrl').value = 'linkedin.com/in/sarahchen-sequoia';
+}
+
+function startAnalysis() {
+  const name = document.getElementById('contactName').value || 'Sarah Chen';
+  document.getElementById('lsName').textContent = name;
+  document.getElementById('outName').textContent = name;
+  goTo(6);
+}
+
+function runLoading() {
+  for(let x=0;x<5;x++){
+    const row = document.getElementById('lsrow'+x);
+    const status = document.getElementById('lss'+x);
+    if(row){row.className='loading-step'; }
+    if(status){status.textContent='';}
+  }
+  let i = 0;
+  document.getElementById('lsrow0').classList.add('active');
+  const interval = setInterval(() => {
+    const cur = document.getElementById('lsrow'+i);
+    const curStatus = document.getElementById('lss'+i);
+    if(cur) cur.classList.remove('active');
+    if(cur) cur.classList.add('done');
+    if(curStatus) curStatus.textContent = '✓';
+    if (i < 4) {
+      i++;
+      const next = document.getElementById('lsrow'+i);
+      if(next) next.classList.add('active');
+    } else {
+      clearInterval(interval);
+      setTimeout(() => goTo(7), 500);
+    }
+  }, 750);
+}
+
+function sendWA() {
+  const draft = document.getElementById('draftText').innerText;
+  const encoded = encodeURIComponent(draft);
+  window.open('https://wa.me/?text=' + encoded, '_blank');
+}
+
+let currentBilling = 'quarterly';
+let currentTierView = 'individual';
+
+function setBilling(type) {
+  currentBilling = type;
+  const mo = document.getElementById('bill-mo');
+  const qtr = document.getElementById('bill-qtr');
+  const price = document.getElementById('price-display');
+  const period = document.getElementById('price-period');
+  const sub = document.getElementById('price-sub');
+  if (type === 'monthly') {
+    mo.classList.add('bill-active'); qtr.classList.remove('bill-active');
+    price.innerHTML = '$10.99<span id="price-period" style="font-size:14px;font-weight:400;color:var(--muted)">/mo</span>';
+    if(sub) sub.textContent = 'Billed monthly · cancel anytime';
+  } else {
+    qtr.classList.add('bill-active'); mo.classList.remove('bill-active');
+    price.innerHTML = '$8.99<span id="price-period" style="font-size:14px;font-weight:400;color:var(--muted)">/mo</span>';
+    if(sub) sub.textContent = 'Billed $26.99/quarter · cancel anytime';
+  }
+}
+
+function showTiers(view) {
+  currentTierView = view;
+  const ind = document.getElementById('tiers-individual');
+  const team = document.getElementById('tiers-team');
+  const togInd = document.getElementById('tog-ind');
+  const togTeam = document.getElementById('tog-team');
+  const thumb = document.getElementById('tog-thumb');
+  if (view === 'individual') {
+    ind.style.display = 'block'; team.style.display = 'none';
+    togInd.style.color = 'var(--lu)'; togTeam.style.color = 'var(--muted)';
+    thumb.style.left = '3px';
+  } else {
+    ind.style.display = 'none'; team.style.display = 'block';
+    togTeam.style.color = 'var(--lu)'; togInd.style.color = 'var(--muted)';
+    thumb.style.left = '23px';
+  }
+}
+
+function toggleTierView() {
+  showTiers(currentTierView === 'individual' ? 'team' : 'individual');
+}
+</script>
 </body>
 </html>
