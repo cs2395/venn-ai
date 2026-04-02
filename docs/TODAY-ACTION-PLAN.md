@@ -1,4 +1,4 @@
-# LevelUp.ai — TODAY'S ACTION PLAN
+# Venn.ai — TODAY'S ACTION PLAN
 
 ---
 
@@ -13,7 +13,7 @@
 | | 1.4 | `git init` + first commit | 2 min | — | Version control active from day 1 |
 | **2** | | **COLLECT ALL 5 AGENT OUTPUTS** | **15 min** | | **Every piece of built code in one repo** |
 | | 2.1 | Download Agent 1 output → `frontend/levelup-app.jsx` | 2 min | This chat (outputs) | Main demo UI with real LinkedIn lookup + AI pipeline |
-| | 2.2 | Download Agent 2 output → `frontend/LevelUpAI.jsx` | 2 min | [Agent 2 chat](https://claude.ai/chat/ffe0ae9d-e768-4866-bf91-4e0713152f1e) | Alternate 8-screen onboarding UI (design reference) |
+| | 2.2 | Download Agent 2 output → `frontend/VennAI.jsx` | 2 min | [Agent 2 chat](https://claude.ai/chat/ffe0ae9d-e768-4866-bf91-4e0713152f1e) | Alternate 8-screen onboarding UI (design reference) |
 | | 2.3 | Download Agent 3 outputs → `database/levelup_schema.sql` + `database/supabase.js` | 3 min | [Agent 3 chat](https://claude.ai/chat/11b69b01-09f4-43ce-89c3-3cb4ea82dcc2) | DB schema with RLS + auth hooks + JS client helpers |
 | | 2.4 | Download Agent 4 output → `workflows/levelup-ai-workflow.json` | 2 min | [Agent 4 chat](https://claude.ai/chat/b025ab65-aac2-4cfd-9f26-fd51ecfd8998) | n8n workflow ready to import (7 nodes, error handling) |
 | | 2.5 | Download Agent 5 output → `backend/integrations.ts` | 2 min | [Agent 5 chat](https://claude.ai/chat/253b43d0-6f80-43a2-ac78-04f968b63f95) | TypeScript API functions: Proxycurl, WA parser, Cal, PostHog, Stripe |
@@ -111,7 +111,7 @@ mv ~/Downloads/levelup-app.jsx frontend/levelup-app.jsx
 
 # Agent 2 — go to chat, download JSX artifact
 # https://claude.ai/chat/ffe0ae9d-e768-4866-bf91-4e0713152f1e
-mv ~/Downloads/LevelUpAI.jsx frontend/LevelUpAI.jsx
+mv ~/Downloads/VennAI.jsx frontend/VennAI.jsx
 
 # Agent 3 — go to chat, download both files
 # https://claude.ai/chat/11b69b01-09f4-43ce-89c3-3cb4ea82dcc2

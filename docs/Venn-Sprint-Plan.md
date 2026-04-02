@@ -1,4 +1,4 @@
-# LevelUp.ai — Updated 1-Day Sprint Plan
+# Venn.ai — Updated 1-Day Sprint Plan
 ## Demo-Ready with Real Contact Import
 
 ---
@@ -9,11 +9,11 @@ Neither WhatsApp nor LinkedIn offers a "browse your contacts" consumer API. What
 
 ### 3-Path Contact Import Strategy
 
-| Path | User Action | What LevelUp Does | Friction |
+| Path | User Action | What Venn Does | Friction |
 |---|---|---|---|
 | **A: WhatsApp Export** | User exports chat as .txt from WhatsApp (2 taps) → uploads or pastes | Parses contacts, messages, context automatically | Low — but needs in-app guide |
 | **B: LinkedIn Lookup** | User types a name, URL, or "Name at Company" | Web search finds real profile data (role, company, headline, recent activity) | Very low — already working |
-| **C: Manual Quick-Add** | User types contact name + any details they remember | LevelUp enriches via web search, generates talking points from whatever context is provided | Lowest — fallback for anyone |
+| **C: Manual Quick-Add** | User types contact name + any details they remember | Venn enriches via web search, generates talking points from whatever context is provided | Lowest — fallback for anyone |
 
 **All 3 paths feed the same AI pipeline.** The more data the user provides, the better the output — but even Path C (just a name) produces useful results.
 
@@ -34,7 +34,7 @@ Neither WhatsApp nor LinkedIn offers a "browse your contacts" consumer API. What
 | 9 | Supabase schema + auth | ✅ Done | [Agent 3 chat](https://claude.ai/chat/11b69b01-09f4-43ce-89c3-3cb4ea82dcc2) | `levelup_schema.sql` + `supabase.js` |
 | 10 | n8n workflow JSON | ✅ Done | [Agent 4 chat](https://claude.ai/chat/b025ab65-aac2-4cfd-9f26-fd51ecfd8998) | `levelup-ai-workflow.json` |
 | 11 | API integration functions (TS) | ✅ Done | [Agent 5 chat](https://claude.ai/chat/253b43d0-6f80-43a2-ac78-04f968b63f95) | `integrations.ts` |
-| 12 | Alternate React UI (8-screen flow) | ✅ Done | [Agent 2 chat](https://claude.ai/chat/ffe0ae9d-e768-4866-bf91-4e0713152f1e) | `LevelUpAI.jsx` |
+| 12 | Alternate React UI (8-screen flow) | ✅ Done | [Agent 2 chat](https://claude.ai/chat/ffe0ae9d-e768-4866-bf91-4e0713152f1e) | `VennAI.jsx` |
 | — | — | — | — | — |
 | 13 | **WhatsApp file upload (.txt)** | ❌ Remaining | — | 20 min |
 | 14 | **In-app "How to Export" guides** | ❌ Remaining | — | 30 min |
@@ -101,7 +101,7 @@ New section below LinkedIn: "Don't have a chat export? Add contacts manually."
 | Their company | Optional | Enriches output |
 | What you want from follow-up | Optional | "Get intro to investors" / "Schedule coffee" |
 
-Even with just a name, LevelUp does a web search to find their LinkedIn and generates talking points. With context ("met at AI Summit, discussed RAG"), the output quality jumps significantly.
+Even with just a name, Venn does a web search to find their LinkedIn and generates talking points. With context ("met at AI Summit, discussed RAG"), the output quality jumps significantly.
 
 **Implementation:** Add a "Quick Add" tab/toggle in the input screen that shows a simple form instead of the WhatsApp paste box. Both paths feed the same pipeline.
 
@@ -109,7 +109,7 @@ Even with just a name, LevelUp does a web search to find their LinkedIn and gene
 
 After a user's first analysis, store contact names in browser state. On return visits, show: "Analyze again: Sarah Chen, Marcus Johnson" — one-tap re-analysis with updated context.
 
-**Exit criteria:** User can get contacts into LevelUp via upload, paste, LinkedIn lookup, OR manual entry. Zero dead ends.
+**Exit criteria:** User can get contacts into Venn via upload, paste, LinkedIn lookup, OR manual entry. Zero dead ends.
 
 ---
 

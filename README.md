@@ -62,7 +62,7 @@ See `CLAUDE.md` for full architecture details.
 | Path | From | Purpose |
 |---|---|---|
 | `frontend/levelup-app.jsx` | Agent 1 | Main demo UI with real AI pipeline |
-| `frontend/LevelUpAI.jsx` | Agent 2 | Alternate UI (8-screen onboarding) |
+| `frontend/VennAI.jsx` | Agent 2 | Alternate UI (8-screen onboarding) |
 | `database/levelup_schema.sql` | Agent 3 | Supabase SQL schema + RLS |
 | `database/supabase.js` | Agent 3 | Supabase JS client |
 | `workflows/levelup-ai-workflow.json` | Agent 4 | n8n workflow JSON |

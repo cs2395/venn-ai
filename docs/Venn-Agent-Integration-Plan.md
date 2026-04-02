@@ -1,4 +1,4 @@
-# LevelUp.ai — Agent Integration Plan
+# Venn.ai — Agent Integration Plan
 ## Connecting All 5 Agents via n8n
 
 ---
