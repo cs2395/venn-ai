@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<!-- saved from url=(0053)file:///Users/christinasalib/Downloads/venn-demo.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Venn.ai">
+<meta name="apple-mobile-web-app-title" content="LevelUp.ai">
 <meta name="theme-color" content="#080c0a">
-<link rel="manifest" href="file:///Users/christinasalib/Downloads/manifest.json">
-<title>Venn.ai — 5-Agent Relationship Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link href="./index_files/css2" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<title>LevelUp.ai — 5-Agent Relationship Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #fafafa;
+  --bg: #080c0a;
   --bg2: #0f1410;
   --bg3: #161d18;
   --card: #1a2420;
-  --lu: #009955;
-  --lu2: #007a3d;
+  --lu: #00E676;
+  --lu2: #00c766;
   
   
   --teal: #00C9B1;
@@ -33,132 +33,127 @@
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow: hidden; }
 
 /* APP SHELL */
-#app { height: 100vh; display: flex; flex-direction: column; width: 100%; position: relative; overflow: hidden; }
+#app { height: 100vh; display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; position: relative; overflow: hidden; }
 
 /* SCREENS */
-.screen { position: absolute; inset: 0; display: flex; flex-direction: column; transition: opacity 0.25s ease; }
-.screen.hidden { opacity: 0; pointer-events: none; display: none; }
-.screen.exit { opacity: 0; pointer-events: none; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s; }
+.screen.hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
+.screen.exit { transform: translateX(-100%); opacity: 0; pointer-events: none; }
 
 /* HEADER */
-.top-bar { padding: 14px 20px 0; display: flex; align-items: center; flex-shrink: 0; gap: 8px; }
-.try-demo-btn { background: #009955; color: #fff; border: none; border-radius: 20px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.02em; flex-shrink: 0; white-space: nowrap; }
-.try-demo-btn:active { opacity: 0.85; transform: scale(0.97); }
-.logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: #007a3d; letter-spacing: -0.02em; display:flex; align-items:center; }
-.logo span { color: #006633; font-weight: 800; }
-.progress-dots { display: flex; gap: 5px; align-items: center; flex: 1; justify-content: center; }
+.top-bar { padding: 16px 20px 0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--lu); letter-spacing: -0.02em; }
+.logo span { color: var(--text); font-weight: 700; }
+.progress-dots { display: flex; gap: 5px; align-items: center; }
 .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); transition: all 0.3s; }
 .dot.active { background: var(--lu); width: 18px; border-radius: 3px; }
 .dot.done { background: var(--lu); opacity: 0.5; }
 
 /* SCROLL CONTENT */
-.scroll-content { flex: 1; overflow-y: auto; padding: 0 20px 120px; -webkit-overflow-scrolling: touch; }
+.scroll-content { flex: 1; overflow-y: auto; padding: 0 20px 100px; -webkit-overflow-scrolling: touch; }
 .scroll-content::-webkit-scrollbar { display: none; }
 
 /* HERO SCREEN */
-.hero-tag { display: inline-flex; align-items: center; gap: 6px; background: #c8edd8; border: 1.5px solid #7dc9a0; border-radius: 20px; padding: 7px 16px; font-size: 12px; font-weight: 700; color: #005c2e; margin: 16px 0 14px; letter-spacing: 0.01em; }
-.hero-tag::before { content: '✦'; font-size: 10px; color: #FFD000; flex-shrink:0; }
-h1.hero { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; line-height: 1.08; color: #2d6648; margin-bottom: 2px; letter-spacing: -0.02em; }
+.hero-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.3); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--gold2); margin: 24px 0 20px; }
+.hero-tag::before { content: '✦'; font-size: 10px; }
+h1.hero { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1.15; color: #2d6648; margin-bottom: 8px; }
 h1.hero .accent { color: var(--lu); }
-.hero-dim { color: #7a8c82; }
-.hero-mid { color: #9aaa9f; font-size: 0.52em; font-weight: 600; display: block; margin-top: 4px; letter-spacing: -0.01em; }  
-.hero-bright { color: #009955; display: block; }
-.hero-sub { font-size: 15px; color: #444444; line-height: 1.6; margin-bottom: 32px; }
-.hero-sub strong { color: #0d0d0d; }
+.hero-dim { color: #2d6648; }
+.hero-mid { color: #3d9960; }  
+.hero-bright { color: #00E676; }
+.hero-sub { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+.hero-sub strong { color: var(--text); }
 
 /* SURVEY CARD */
-.survey-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 20px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-top: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.survey-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 20px; padding: 20px; margin-top: 20px; }
 .q-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lu); margin-bottom: 10px; }
-.q-text { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.3; color: #3d4f47; margin-bottom: 6px; }
-.q-hint { font-size: 12px; color: #666666; margin-bottom: 16px; }
+.q-text { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.3; color: #fff; margin-bottom: 6px; }
+.q-hint { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
 .progress-bar-wrap { height: 3px; background: var(--faint); border-radius: 2px; margin-bottom: 20px; }
 .progress-bar-fill { height: 100%; border-radius: 2px; background: var(--lu); transition: width 0.4s; }
 
 /* OPTION ITEMS */
-.option-item { display: flex; align-items: center; gap: 12px; background: #f4f6f4; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+.option-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
 .option-item:active { transform: scale(0.98); }
-.option-item.selected { border-color: #FFD000; background: rgba(212,168,67,0.10); }
+.option-item.selected { border-color: var(--gold); background: rgba(212,168,67,0.10); }
 .option-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
-.option-text { flex: 1; font-size: 14px; line-height: 1.4; color: #111111; }
-.option-check { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #aaa; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; background: #fff; }
-.option-item.selected .option-check { background: #FFD000; border-color: #FFD000; }
-.option-check::after { content: '✓'; font-size: 14px; color: #fff; font-weight: 900; opacity: 0; transition: opacity 0.2s; }
-.option-item.selected .option-check::after { opacity: 1; color: #fff; }
+.option-text { flex: 1; font-size: 14px; line-height: 1.4; color: var(--text); }
+.option-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+.option-item.selected .option-check { background: var(--gold); border-color: var(--gold); }
+.option-check::after { content: '✓'; font-size: 11px; color: #fff; opacity: 0; transition: opacity 0.2s; }
+.option-item.selected .option-check::after { opacity: 1; color: #000; }
 
 /* RADIO ITEMS */
-.radio-item { display: flex; align-items: center; gap: 12px; background: #f4f6f4; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
-.radio-item.selected { border-color: #FFD000; background: rgba(212,168,67,0.12); }
-.radio-dot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #aaa; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #fff; }
-.radio-item.selected .radio-dot { background: #FFD000; border-color: #FFD000; }
+.radio-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+.radio-item.selected { border-color: var(--gold2); background: rgba(212,168,67,0.12); }
+.radio-dot { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.radio-item.selected .radio-dot { background: var(--gold); border-color: var(--gold); }
 .radio-item.selected .radio-dot::after { content: ''; display: block; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
 
 /* TEXT AREA */
-.other-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #666; margin: 16px 0 8px; }
+.other-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
 .voice-row { display: flex; gap: 10px; align-items: flex-start; }
-textarea.other-input { flex: 1; background: #f2f4f2; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; resize: none; height: 80px; outline: none; }
+textarea.other-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; resize: none; height: 80px; outline: none; }
 textarea.other-input::placeholder { color: var(--muted); }
-textarea.other-input:focus { border-color: #FFD000; }
-.mic-btn { width: 44px; height: 44px; border-radius: 50%; background: #eff1ef; border: 1px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
-.voice-link { font-size: 13px; color: #007a3d; margin-top: 6px; cursor: pointer; font-weight: 600; }
+textarea.other-input:focus { border-color: var(--gold); }
+.mic-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--faint); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+.voice-link { font-size: 13px; color: var(--gold2); margin-top: 6px; cursor: pointer; }
 
 /* BUTTONS */
-.btn-primary { width: 100%; padding: 16px; border-radius: 14px; background: var(--lu); border: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary { width: 100%; padding: 16px; border-radius: 14px; background: var(--gold); border: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
-.btn-secondary { flex: 1; padding: 14px; border-radius: 12px; background: #eceeed; border: 1px solid rgba(0,0,0,0.10); color: #555; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-secondary { flex: 1; padding: 14px; border-radius: 12px; background: transparent; border: 1px solid var(--faint); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .btn-secondary:active { background: var(--faint); }
-.btn-lu { width: 100%; padding: 16px; border-radius: 14px; background: var(--lu); border: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-lu { width: 100%; padding: 16px; border-radius: 14px; background: var(--lu); border: none; color: #000; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .btn-lu:active { transform: scale(0.98); }
-.btn-gold { width: 100%; padding: 16px; border-radius: 14px; background: #FFD000; border: none; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-gold:active { transform: scale(0.98); opacity: 0.9; }
-.btn-amber { width: 100%; padding: 16px; border-radius: 14px; background: #FFD000; border: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-amber { width: 100%; padding: 16px; border-radius: 14px; background: var(--gold); border: none; color: #000; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .btn-row { display: flex; gap: 10px; }
 
 /* STICKY BOTTOM */
-.sticky-bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 20px 32px; background: linear-gradient(to top, #f9faf9 70%, transparent); max-width: 430px; margin: 0 auto; z-index: 10; }
+.sticky-bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 20px 32px; background: linear-gradient(to top, var(--bg) 70%, transparent); max-width: 430px; margin: 0 auto; }
 
 /* SCORE SCREEN */
-.score-card { background: #fff; border: 1px solid rgba(184,144,42,0.3); border-radius: 20px; padding: 24px 20px; margin-top: 20px; text-align: center; }
-.score-badge { display: inline-block; background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.3); border-radius: 20px; padding: 6px 16px; font-size: 12px; color: #FFD000; margin-bottom: 16px; }
-.score-num { font-family: 'Syne', sans-serif; font-size: 80px; font-weight: 800; color: #009955; line-height: 1; margin-bottom: 4px; }
-.score-label { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #2d4035; margin-bottom: 8px; }
-.score-desc { font-size: 13px; color: #555; line-height: 1.5; }
+.score-card { background: var(--bg3); border: 1px solid rgba(212,168,67,0.3); border-radius: 20px; padding: 24px 20px; margin-top: 20px; text-align: center; }
+.score-badge { display: inline-block; background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.3); border-radius: 20px; padding: 6px 16px; font-size: 12px; color: var(--gold2); margin-bottom: 16px; }
+.score-num { font-family: 'Syne', sans-serif; font-size: 80px; font-weight: 800; color: var(--gold2); line-height: 1; margin-bottom: 4px; }
+.score-label { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.score-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
 .progress-pill { height: 6px; background: var(--faint); border-radius: 3px; margin: 16px 0 0; overflow: hidden; }
 .progress-pill-fill { height: 100%; border-radius: 3px; background: var(--lu); width: 87%; }
-.time-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 20px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-top: 12px; }
+.time-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 20px; padding: 20px; margin-top: 12px; }
 .time-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
-.time-num { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--lu); line-height: 1; }
+.time-num { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--teal); line-height: 1; }
 .time-num span { font-size: 28px; font-weight: 600; }
-.time-sub { font-size: 13px; color: #555; margin: 4px 0 14px; }
+.time-sub { font-size: 13px; color: var(--muted); margin: 4px 0 14px; }
 .time-divider { height: 1px; background: var(--faint); margin: 12px 0; }
-.time-tag { color: #007a3d !important; font-size: 13px; padding: 6px 14px; }
-.time-tag-x { display: inline-block; background: rgba(0,153,85,0.08); border: 1px solid rgba(0,153,85,0.2); border-radius: 8px; padding: 5px 12px; font-size: 12px; color: var(--lu); margin: 4px 4px 0 0; }
+.time-tag { display: inline-block; background: rgba(0,201,177,0.1); border: 1px solid rgba(0,201,177,0.25); border-radius: 8px; padding: 5px 12px; font-size: 12px; color: var(--teal); margin: 4px 4px 0 0; }
 
 /* EMAIL GATE */
-.email-section { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 20px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-top: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-.email-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #2d4035; margin-bottom: 8px; }
-.email-desc { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 16px; }
-input.email-input { width: 100%; background: #fff; border: 1px solid rgba(0,0,0,0.12); border-radius: 12px; padding: 14px 16px; color: #2d3d35; font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; margin-bottom: 12px; }
-input.email-input:focus { border-color: #FFD000; }
+.email-section { background: var(--bg3); border: 1px solid var(--faint); border-radius: 20px; padding: 20px; margin-top: 20px; }
+.email-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.email-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
+input.email-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; margin-bottom: 12px; }
+input.email-input:focus { border-color: var(--gold); }
 input.email-input::placeholder { color: var(--muted); }
-.fine-print { font-size: 11px; color: #777; text-align: center; margin-top: 10px; line-height: 1.5; }
-.skip-link { text-align: center; margin-top: 16px; font-size: 16px; color: #555; cursor: pointer; }
-.skip-link a { color: #009955; font-weight: 600; text-decoration: underline; text-decoration: none; }
+.fine-print { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; line-height: 1.5; }
+.skip-link { text-align: center; margin-top: 14px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.skip-link a { color: var(--lu); text-decoration: none; }
 
 /* CHANNEL SELECT */
 .channel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-.channel-card { background: #fff; border: 1.5px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 18px 14px; cursor: pointer; transition: all 0.2s; text-align: center; }
+.channel-card { background: var(--bg3); border: 1.5px solid var(--faint); border-radius: 16px; padding: 18px 14px; cursor: pointer; transition: all 0.2s; text-align: center; }
 .channel-card:active { transform: scale(0.97); }
-.channel-card.selected { border-color: var(--lu); background: rgba(0,153,85,0.08); }
+.channel-card.selected { border-color: var(--lu); background: rgba(0,230,118,0.08); }
 .channel-icon { font-size: 32px; margin-bottom: 10px; }
-.channel-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: #2d4a38; margin-bottom: 4px; }
-.channel-desc { font-size: 11px; color: #666; line-height: 1.4; }
+.channel-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.channel-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
 .channel-card.selected .channel-name { color: var(--lu); }
 
 /* LOADING */
-.loading-ring { width: 64px; height: 64px; border: 3px solid var(--faint); border-top-color: #FFD000; border-radius: 50%; animation: spin 1s linear infinite; margin: 32px auto 24px; }
+.loading-ring { width: 64px; height: 64px; border: 3px solid var(--faint); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 32px auto 24px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: #2d4a38; text-align: center; margin-bottom: 6px; }
-.loading-sub { font-size: 13px; color: #555; text-align: center; margin-bottom: 32px; }
+.loading-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 6px; }
+.loading-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 32px; }
 .loading-steps { display: flex; flex-direction: column; gap: 14px; padding: 0 8px; }
 .loading-step { display: flex; align-items: center; gap: 14px; }
 .step-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
@@ -167,82 +162,80 @@ input.email-input::placeholder { color: var(--muted); }
 .step-text.done { color: var(--lu); }
 
 /* OUTPUT */
-.usage-bar { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--faint); border-radius: 12px; padding: 10px 14px; margin-top: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.usage-dot { width: 8px; height: 8px; border-radius: 50%; background: #FFD000; }
-.usage-text { flex: 1; font-size: 12px; color: #555; }
+.usage-bar { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--faint); border-radius: 12px; padding: 10px 14px; margin-top: 16px; }
+.usage-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+.usage-text { flex: 1; font-size: 12px; color: var(--muted); }
 .usage-text strong { color: var(--text); }
-.tier-badge { background: #eff1ef; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.tier-badge { background: var(--bg); border: 1px solid var(--faint); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--muted); }
 
 .section-head { display: flex; align-items: center; gap: 10px; margin: 24px 0 12px; }
 .section-icon { font-size: 18px; }
-.section-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: #009955; }
-.section-line { flex: 1; height: 1px; background: rgba(0,0,0,0.08); }
+.section-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--lu); }
+.section-line { flex: 1; height: 1px; background: var(--faint); }
 
-.contact-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 14px; }
-.contact-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(0,153,85,0.08); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
-.contact-name { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: #2d4035; }
-.contact-role { font-size: 12px; color: #444; margin-top: 3px; line-height:1.5; }
-.new-badge { background: rgba(0,153,85,0.10); border: 1px solid rgba(0,153,85,0.25); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--lu); margin-left: auto; }
+.contact-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 14px; }
+.contact-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(0,230,118,0.10); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.contact-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: #fff; }
+.contact-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.new-badge { background: rgba(0,201,177,0.15); border: 1px solid rgba(0,201,177,0.3); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--teal); margin-left: auto; }
 
-.facts-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; overflow: hidden; }
+.facts-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; overflow: hidden; }
 .fact-item { padding: 14px 16px; border-bottom: 1px solid var(--faint); }
 .fact-item:last-child { border-bottom: none; }
-.fact-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: rgba(0,153,85,0.10); border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--lu); margin-bottom: 8px; }
-.fact-text { font-size: 13px; line-height: 1.55; color: #3d4f47; }
+.fact-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: rgba(0,230,118,0.12); border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--lu); margin-bottom: 8px; }
+.fact-text { font-size: 13px; line-height: 1.55; color: var(--text); }
 .source-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.src-pill { background: #f0f2f0; border: 1px solid rgba(0,0,0,0.08); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: #666; }
+.src-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--muted); }
 
-.talking-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
-.tp-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #007a3d; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-.tp-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #FFD000; border-radius: 6px; font-size: 11px; color: #fff; font-weight: 700; }
-.tp-text { font-size: 14px; line-height: 1.55; color: #3d4f47; margin-bottom: 10px; }
-.tp-quote { border-left: 2px solid #FFD000; padding-left: 12px; margin-top: 8px; }
-.tp-quote-text { font-size: 12px; font-style: italic; color: #666; line-height: 1.5; }
+.talking-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
+.tp-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lu); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.tp-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--gold); border-radius: 6px; font-size: 11px; color: #fff; font-weight: 700; }
+.tp-text { font-size: 14px; line-height: 1.55; color: var(--text); margin-bottom: 10px; }
+.tp-quote { border-left: 2px solid var(--gold); padding-left: 12px; margin-top: 8px; }
+.tp-quote-text { font-size: 12px; font-style: italic; color: var(--muted); line-height: 1.5; }
 
-.action-item { display: flex; align-items: flex-start; gap: 12px; background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 14px; margin-bottom: 8px; }
-.action-check { width: 22px; height: 22px; border: 2px solid #009955; border-radius: 5px; flex-shrink: 0; margin-top: 1px; cursor:pointer; background:#fff; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
-.action-check.checked { background:#009955; border-color:#006633; }
-.action-check.checked::after { content:"✓"; color:#fff; font-size:13px; font-weight:900; }
-.action-text { font-size: 13px; line-height: 1.4; color: #3d4f47; }
-.action-meta { font-size: 11px; color: #777; margin-top: 3px; }
+.action-item { display: flex; align-items: flex-start; gap: 12px; background: var(--bg3); border: 1px solid var(--faint); border-radius: 12px; padding: 14px; margin-bottom: 8px; }
+.action-check { width: 20px; height: 20px; border: 1.5px solid var(--teal); border-radius: 5px; flex-shrink: 0; margin-top: 1px; }
+.action-text { font-size: 13px; line-height: 1.4; color: var(--text); }
+.action-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-.draft-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 16px; }
-.draft-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #007a3d; margin-bottom: 12px; }
-.draft-text { font-size: 14px; line-height: 1.7; color: #3d4f47; }
+.draft-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; }
+.draft-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.draft-text { font-size: 14px; line-height: 1.7; color: var(--text); }
 
-.tone-section { background: #fffdf0; border: 2px solid rgba(255,208,0,0.5); border-radius: 16px; padding: 18px; margin-top: 0; box-shadow: 0 2px 12px rgba(255,208,0,0.15); }
-.tone-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #2d4a38; margin-bottom: 4px; }
-.tone-sub { font-size: 12px; color: #5a7060; margin-bottom: 14px; }
+.tone-section { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; margin-top: 12px; }
+.tone-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.tone-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
 .tone-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .tone-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .tone-chip { padding: 7px 14px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
-.tone-chip.selected { background: rgba(0,153,85,0.08); border-color: var(--lu); color: var(--lu); }
+.tone-chip.selected { background: rgba(0,230,118,0.10); border-color: var(--lu); color: var(--lu); }
 .feedback-row { display: flex; gap: 10px; margin-bottom: 10px; }
-textarea.feedback-input { flex: 1; background: #f2f4f2; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; resize: none; height: 70px; outline: none; }
-textarea.feedback-input:focus { border-color: #FFD000; }
+textarea.feedback-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; resize: none; height: 70px; outline: none; }
+textarea.feedback-input:focus { border-color: var(--gold); }
 textarea.feedback-input::placeholder { color: var(--muted); }
-.btn-regen { width: 100%; padding: 14px; border-radius: 12px; background: var(--lu); border: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn-regen { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,230,118,0.08); border: 1px solid var(--border); color: var(--lu); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
 
 .sched-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0; }
-.sched-btn { background: #fff; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #111; cursor: pointer; transition: all 0.2s; }
+.sched-btn { background: var(--bg3); border: 1px solid var(--faint); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); cursor: pointer; transition: all 0.2s; }
 .sched-btn:active { border-color: var(--lu); background: rgba(0,230,118,0.06); }
 
 /* PRO UPSELL */
-.pro-card { background: #faf8f2; border: 1px solid var(--gold-border); border-radius: 20px; padding: 20px; margin-top: 12px; }
-.pro-tag { display: inline-block; background: #FFD000; border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.pro-card { background: #110f08; border: 1px solid var(--gold-border); border-radius: 20px; padding: 20px; margin-top: 12px; }
+.pro-tag { display: inline-block; background: var(--gold); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 700; color: #000; margin-bottom: 12px; }
 .pro-headline { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.2; }
-.pro-desc { font-size: 13px; color: #7a6020; line-height: 1.5; margin-bottom: 16px; }
+.pro-desc { font-size: 13px; color: rgba(212,168,67,0.7); line-height: 1.5; margin-bottom: 16px; }
 .pro-feature { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .pro-feature:last-of-type { border-bottom: none; }
 .pro-fi { font-size: 16px; width: 24px; flex-shrink: 0; }
 .pro-ft { font-size: 13px; color: var(--text); line-height: 1.4; }
-.pro-lock { background: #f0f2f0; border-radius: 6px; padding: 2px 8px; font-size: 10px; color: #777; margin-left: auto; flex-shrink: 0; }
-.pro-price { color: var(--lu); font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; color: #FFD000; margin: 16px 0 4px; }
+.pro-lock { background: rgba(255,255,255,0.08); border-radius: 6px; padding: 2px 8px; font-size: 10px; color: var(--muted); margin-left: auto; flex-shrink: 0; }
+.pro-price { color: var(--lu); font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; color: var(--gold); margin: 16px 0 4px; }
 .pro-price span { font-size: 14px; font-weight: 400; color: var(--muted); }
 .pro-fine { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
 
 /* WA INTEGRATION SCREEN */
-.integration-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
+.integration-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
 .integration-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .integration-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 .integration-icon.wa { background: rgba(37,211,102,0.15); }
@@ -250,175 +243,50 @@ textarea.feedback-input::placeholder { color: var(--muted); }
 .integration-icon.ig { background: rgba(225,48,108,0.15); }
 .integration-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
 .integration-sub { font-size: 11px; color: var(--muted); }
-.connect-btn { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--lu); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.connect-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--lu); background: rgba(0,230,118,0.08); color: var(--lu); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .connect-btn:active { background: rgba(0,230,118,0.15); }
 .connect-btn.connected { background: rgba(0,230,118,0.12); color: var(--lu); border-color: var(--lu); }
 .connected-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--lu); margin-top: 6px; }
 
 /* INPUT SCREEN */
-.input-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #006633; margin-bottom: 8px; }
-input.text-input { width: 100%; background: #fff; border: 1.5px solid rgba(0,0,0,0.18); border-radius: 12px; padding: 12px 14px; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; margin-bottom: 14px; }
+.input-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lu); margin-bottom: 8px; }
+input.text-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; margin-bottom: 14px; }
 input.text-input:focus { border-color: var(--lu); }
 input.text-input::placeholder { color: var(--muted); }
 textarea.wa-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--faint); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.6; resize: none; height: 160px; outline: none; margin-bottom: 14px; }
 textarea.wa-input:focus { border-color: var(--lu); }
 textarea.wa-input::placeholder { color: var(--muted); }
-.sample-btn { background: rgba(0,153,85,0.08); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: var(--lu); cursor: pointer; margin-bottom: 14px; display: inline-block; }
-.input-hint { font-size: 11px; color: #4a5e52; margin-bottom: 14px; line-height: 1.5; }
-.input-hint a { color: #FFD000; text-decoration: none; }
+.sample-btn { background: rgba(0,230,118,0.08); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: var(--lu); cursor: pointer; margin-bottom: 14px; display: inline-block; }
+.input-hint { font-size: 11px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+.input-hint a { color: var(--gold2); text-decoration: none; }
 
 
 /* AGENT STEPS */
-.agent-icon { font-size: 22px; width: 36px; height: 36px; border-radius: 10px; background: rgba(0,153,85,0.08); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+.agent-icon { font-size: 22px; width: 36px; height: 36px; border-radius: 10px; background: rgba(0,230,118,0.08); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
 .agent-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--muted); transition: color 0.3s; margin-bottom: 2px; }
-.agent-desc { font-size: 11px; color: #666; opacity: 0.6; transition: opacity 0.3s; }
+.agent-desc { font-size: 11px; color: var(--muted); opacity: 0.6; transition: opacity 0.3s; }
 .agent-status { margin-left: auto; font-size: 14px; flex-shrink: 0; }
 .loading-step { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; border: 1px solid transparent; transition: all 0.4s; }
-.loading-step.active { background: rgba(0,153,85,0.06); border-color: var(--border); }
+.loading-step.active { background: rgba(0,230,118,0.06); border-color: var(--border); }
 .loading-step.active .agent-name { color: var(--lu); }
 .loading-step.active .agent-desc { opacity: 1; color: var(--muted); }
-.loading-step.active .agent-icon { background: rgba(0,153,85,0.12); border-color: var(--lu); }
+.loading-step.active .agent-icon { background: rgba(0,230,118,0.15); border-color: var(--lu); }
 .loading-step.done .agent-name { color: var(--lu); }
-.loading-step.done .agent-icon { background: rgba(0,153,85,0.10); border-color: var(--lu); }
+.loading-step.done .agent-icon { background: rgba(0,230,118,0.12); border-color: var(--lu); }
 
 
 /* PRICING CARDS */
-.pricing-card { background: #fffaed; border: 1.5px solid rgba(255,208,0,0.5); border-radius: 18px; padding: 20px; box-shadow: 0 2px 8px rgba(122,79,0,0.15); }
-.pricing-featured { border-color: var(--border); background: #f5faf7; box-shadow: 0 0 0 1px rgba(0,230,118,0.08); }
+.pricing-card { background: var(--bg3); border: 1px solid var(--faint); border-radius: 18px; padding: 20px; }
+.pricing-featured { border-color: var(--border); background: var(--bg2); box-shadow: 0 0 0 1px rgba(0,230,118,0.08); }
 .pf-row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--faint); }
 .pf-row:last-of-type { border-bottom: none; }
-.pf-icon { font-size: 15px; width: 22px; flex-shrink: 0; margin-top: 1px; filter: brightness(1.2); }
-.pf-text { font-size: 13px; color: #f5e6c8; line-height: 1.4; }
-.pf-text strong { font-weight: 600; color: #fff; }
+.pf-icon { font-size: 15px; width: 22px; flex-shrink: 0; margin-top: 1px; }
+.pf-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+.pf-text strong { font-weight: 600; }
 .pf-locked .pf-icon { opacity: 0.3; }
-.pf-dim { color: #777 !important; }
-.bill-chip { padding: 6px 14px; border-radius: 20px; background: #f0f2f0; border: 1px solid rgba(0,0,0,0.1); font-size: 12px; color: #333; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; }
-.bill-active { background: rgba(0,153,85,0.08); border-color: var(--border); color: var(--lu); }
-
-
-/* VOICE BANNER */
-.voice-pill-banner { display:block; width:100%; background:#FFD000; color:#1a1a1a; box-shadow: 0 3px 12px rgba(255,208,0,0.35); font-family:'Syne',sans-serif; font-size:17px; font-weight:700; padding:15px 22px; border-radius:16px; margin:20px 0 10px; text-align:center; letter-spacing:-0.01em; }
-
-/* STAT BLOCK */
-.stat-block { margin-bottom: 32px; }
-.hero-ri { 
-  display: inline-block;
-  font-size: 13px; 
-  font-weight: 700; 
-  color: #007a3d; 
-  letter-spacing: 0.06em; 
-  text-transform: uppercase; 
-  margin-top: 10px;
-  margin-bottom: 18px;
-  background: rgba(0,153,85,0.08);
-  border: 1.5px solid rgba(0,153,85,0.25);
-  border-radius: 8px;
-  padding: 6px 14px;
-}
-.stat-pill { display: inline-block; background: #FFD000; color: #1a1a1a; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; padding: 11px 22px; border-radius: 100px; margin-bottom: 16px; letter-spacing: -0.01em; }
-.stat-desc { font-size: 14px; color: #555; line-height: 1.6; }
-.time-sub-pill { display: inline-block; background: #FFD000; color: #1a1a1a; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; padding: 11px 22px; border-radius: 100px; margin: 8px 0 16px; letter-spacing: -0.01em; }
-
-
-/* RANKING */
-.rank-items { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-.rank-item { display: flex; align-items: center; gap: 12px; background: #f5f7f5; border: 2px solid #e0e8e2; border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: all 0.2s; }
-.rank-item:active { transform: scale(0.98); }
-.rank-item.ranked { border-color: #009955; background: #f0faf4; }
-.rank-num { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: #ccc; flex-shrink: 0; transition: all 0.2s; background: #fff; }
-.rank-item.ranked .rank-num { background: #009955; border-color: #009955; color: #fff; }
-.rank-text { font-size: 14px; color: #3d4f47; font-weight: 500; }
-
-
-/* OUTPUT FEATURE CARDS */
-.output-feat-card { background: #eef8f2; border: 1.5px solid rgba(0,153,85,0.2); border-radius: 16px; padding: 18px 14px; text-align: center; box-shadow: 0 2px 6px rgba(0,153,85,0.08); }
-.output-feat-gold { border-color: rgba(0,153,85,0.2); background: #f4faf6; }
-.ofc-icon { font-size: 26px; margin-bottom: 6px; }
-.ofc-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: #FFD000; line-height: 1; margin-bottom: 4px; }
-
-.ofc-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: #2d4035; margin-bottom: 6px; line-height: 1.25; }
-.ofc-desc { font-size: 11px; color: #4a5e52; line-height: 1.55; }
-
-
-/* OUTPUT SECTIONS */
-.output-section { background: #f5f7f5; border-radius: 16px; padding: 14px; margin-bottom: 14px; }
-.output-section .section-head { margin-top: 0; }
-
-
-/* RESPONSIVE — desktop expands */
-@media (min-width: 768px) {
-  #app {
-    max-width: 100%;
-    background: #f0f2f0;
-    align-items: center;
-    justify-content: center;
-  }
-  .screen {
-    max-width: 520px;
-    width: 100%;
-    height: 100vh;
-    position: absolute;
-    border-radius: 0;
-    box-shadow: none;
-  }
-  .top-bar {
-    max-width: 520px;
-    width: 100%;
-  }
-}
-
-@media (min-width: 1024px) {
-  body { overflow: hidden; }
-  #app {
-    flex-direction: row;
-    background: #eef0ee;
-    overflow: hidden;
-  }
-  .screen {
-    max-width: 100%;
-    width: 100%;
-    height: 100vh;
-    position: absolute;
-    inset: 0;
-    background: #fafafa;
-  }
-  .scroll-content {
-    max-width: 680px;
-    margin: 0 auto;
-    padding-left: 40px;
-    padding-right: 40px;
-  }
-  .top-bar {
-    max-width: 100%;
-    padding: 20px 40px 0;
-  }
-  .sticky-bottom {
-    max-width: 680px;
-    margin: 0 auto;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 16px 40px 32px;
-    width: 100%;
-  }
-  h1.hero { font-size: 52px; }
-  .stat-pill { font-size: 22px; padding: 16px 32px; }
-  .survey-card { max-width: 600px; margin-left: auto; margin-right: auto; }
-  .score-card { max-width: 600px; margin-left: auto; margin-right: auto; }
-  .time-card { max-width: 600px; margin-left: auto; margin-right: auto; }
-  .email-section { max-width: 600px; margin-left: auto; margin-right: auto; }
-  .output-feat-card { padding: 20px 16px; }
-  .ofc-num { font-size: 36px; }
-  .channel-grid { max-width: 580px; margin: 0 auto; grid-template-columns: repeat(3, 1fr); }
-  .tier-grid { grid-template-columns: repeat(3, 1fr); }
-  .contact-card { max-width: 600px; }
-  .facts-card { max-width: 600px; }
-  .talking-card { max-width: 600px; }
-  .tone-section { max-width: 600px; }
-  .draft-card { max-width: 600px; }
-  .output-section { max-width: 600px; margin-left: auto; margin-right: auto; }
-  .sched-grid { max-width: 400px; }
-  .pricing-card { max-width: 600px; margin-left: auto; margin-right: auto; }
-}
+.pf-dim { color: var(--muted) !important; }
+.bill-chip { padding: 6px 14px; border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid var(--faint); font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; }
+.bill-active { background: rgba(0,230,118,0.08); border-color: var(--border); color: var(--lu); }
 
 /* ANIMATIONS */
 @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -434,9 +302,9 @@ textarea.wa-input::placeholder { color: var(--muted); }
 <div id="app">
 
 <!-- ===== SCREEN 0: HERO ===== -->
-<div class="screen" id="s0" style="background:#f9faf9;">
+<div class="screen" id="s0">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
       <div class="dot active" id="d0"></div>
       <div class="dot" id="d1"></div>
@@ -446,173 +314,80 @@ textarea.wa-input::placeholder { color: var(--muted); }
       <div class="dot" id="d5"></div>
       <div class="dot" id="d6"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
   <div class="scroll-content">
-    <div class="hero-tag fade-up fade-up-1">✦ 5-Agent Relationship Intelligence</div>
-    <h1 class="hero fade-up fade-up-2"><span class="hero-dim">Work Smarter:</span><br><span class="hero-bright">Make Connections<br>That Matter.</span><br><span class="hero-mid">Meet Your Intelligent AI<br>Connections Agent.</span></h1>
-    <div class="hero-ri fade-up fade-up-2">Relationship Intelligence — powered by Hybrid RAG</div>
-    <div class="stat-block fade-up fade-up-3">
-      <div class="stat-pill">✦ 30 seconds, not 30 minutes</div>
-      <p class="stat-desc">Answer 3 quick questions to unlock your free Relationship Intelligence Agent.</p>
-    </div>
+    <div class="hero-tag fade-up fade-up-1">5-Agent Relationship Intelligence · Free Preview</div>
+    <h1 class="hero fade-up fade-up-2"><span class="hero-dim">Work Smarter:</span><br><span class="hero-mid">Your AI<br>Connections Agent.</span><br><span class="hero-bright">Make Stronger<br>Connections Faster.</span></h1>
+    <p class="hero-sub fade-up fade-up-3"><strong>30 seconds, not 30 minutes.</strong><br>Answer 3 quick questions to unlock your free Relationship Intelligence Agent.</p>
 
-    <!-- WHAT YOU GET — inside scroll, below header -->
-    <div style="margin-top:4px;padding-bottom:8px">
-      <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:15px;font-weight:800;color:#007a3d;margin-bottom:16px;text-align:center;letter-spacing:-0.01em">What You Get — Every Contact</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-
-        <div class="output-feat-card">
-          <div class="ofc-icon">💡</div>
-          <div class="ofc-num">3</div>
-          <div class="ofc-title">Talking Points</div>
-          <div class="ofc-desc">Specific, grounded conversation starters based on their actual work and interests</div>
-        </div>
-
-        <div class="output-feat-card">
-          <div class="ofc-icon">🤝</div>
-          <div class="ofc-num">3</div>
-          <div class="ofc-title">Win-Win Collaborations</div>
-          <div class="ofc-desc">Collaboration opportunities where you both benefit &amp; accomplish your goals</div>
-        </div>
-
-        <div class="output-feat-card output-feat-gold">
-          <div class="ofc-icon">✅</div>
-          <div class="ofc-num">3+</div>
-          <div class="ofc-title">Action Items</div>
-          <div class="ofc-desc">Extracted from your chat — every commitment captured, nothing dropped</div>
-        </div>
-
-        <div class="output-feat-card">
-          <div class="ofc-icon">🎙️</div>
-          <div class="ofc-num">3+</div>
-          <div class="ofc-title">Personalized Messages in Your Voice</div>
-          <div class="ofc-desc">Follow-ups drafted in your tone and style — not generic AI copy</div>
-        </div>
-
-        <div class="output-feat-card">
-          <div class="ofc-icon">🔍</div>
-          <div class="ofc-num">5</div>
-          <div class="ofc-title">Key Facts</div>
-          <div class="ofc-desc">Hybrid RAG research — LinkedIn, web, news &amp; social signals</div>
-        </div>
-
-        <div class="output-feat-card output-feat-gold">
-          <div class="ofc-icon">📅</div>
-          <div class="ofc-num">1</div>
-          <div class="ofc-title">Scheduling Follow-Up</div>
-          <div class="ofc-desc">Calendly · Google Cal · Zoom — in the flow</div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-
-  <div class="sticky-bottom">
-    <button class="btn-primary" onclick="goTo(1)">Start Demo →</button>
-    <button id="install-btn" onclick="installPWA()" style="display:none;margin-top:10px;width:100%;padding:13px;border-radius:14px;background:#fff;border:2px solid #009955;color:#009955;font-family:&#39;DM Sans&#39;,sans-serif;font-size:15px;font-weight:600;cursor:pointer;align-items:center;justify-content:center;gap:8px">
-      📲 Add to Home Screen
-    </button>
-  </div>
-</div>
-
-<!-- ===== SCREEN 1: Q1 ===== -->
-<div class="screen hidden" id="s1">
-  <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
-    <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot active"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
-  </div>
-<div class="scroll-content">
-    <div class="survey-card" style="margin-top:20px">
+    <div class="survey-card fade-up fade-up-4">
       <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:14%"></div></div>
-      <div class="q-label">Question 1 of 4</div>
-      <div class="q-text">What holds you back from making stronger, more productive connections?</div>
+      <div class="q-label">Question 1 of 3</div>
+      <div class="q-text">What are your biggest blockers to following up with new contacts?</div>
       <div class="q-hint">Select all that apply</div>
+
       <div class="option-item" onclick="toggleOption(this)">
         <div class="option-icon">📋</div>
-        <div class="option-text">Research &amp; prep takes too long ⏳</div>
+        <div class="option-text">Takes too long to research relevant information about contacts</div>
         <div class="option-check"></div>
       </div>
       <div class="option-item" onclick="toggleOption(this)">
         <div class="option-icon">⏱️</div>
-        <div class="option-text">Connections fade before they convert 🌫️</div>
+        <div class="option-text">Too busy to follow up — contacts go cold</div>
         <div class="option-check"></div>
       </div>
       <div class="option-item" onclick="toggleOption(this)">
         <div class="option-icon">😟</div>
-        <div class="option-text">Outreach feels generic, no responses 😶</div>
+        <div class="option-text">Follow-ups feel generic and ineffective</div>
         <div class="option-check"></div>
       </div>
       <div class="option-item" onclick="toggleOption(this)">
         <div class="option-icon">🤝</div>
-        <div class="option-text">Can't find the right win-win angle 🤔</div>
+        <div class="option-text">Follow-ups feel like asking for help or a benefit too soon</div>
         <div class="option-check"></div>
       </div>
+
       <div class="other-label">Anything else? Tell us directly.</div>
       <div class="voice-row">
-        <textarea class="other-input" placeholder="e.g. Hard to reconnect without feeling awkward..."></textarea>
-        <div class="mic-btn" onclick="startVoiceInput(this)" id="mic-feedback-btn" title="Tap to speak your feedback">🎙️</div>
+        <textarea class="other-input" placeholder="e.g. I meet great people but never know how to reconnect authentically..."></textarea>
+        <div class="mic-btn">🎙️</div>
       </div>
-      <div class="voice-link" style="color:#007a3d">🎙️ Tap to answer by voice</div>
+      <div class="voice-link">Tap to answer by voice</div>
     </div>
   </div>
   <div class="sticky-bottom">
-    <button class="btn-primary" onclick="goTo(2)">Next →</button>
+    <button class="btn-primary" onclick="goTo(1)">Next →</button>
   </div>
 </div>
 
-<!-- ===== SCREEN 2: Q2 ===== -->
-<div class="screen hidden" id="s2">
+<!-- ===== SCREEN 1: Q2 ===== -->
+<div class="screen hidden" id="s1">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot active"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
-<div class="scroll-content">
+  <div class="scroll-content">
     <div class="survey-card" style="margin-top:20px">
       <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:43%"></div></div>
       <div class="q-label">Question 2 of 3</div>
-      <div class="q-text">How often do your new connections convert into strong relationships or productive collabs?</div>
-      <div class="q-hint">Be honest — no judgment here</div>
+      <div class="q-text">How often do contacts fade after meeting?</div>
+      <div class="q-hint">Be honest — this is anonymous</div>
 
       <div class="radio-item selected" onclick="selectRadio(this)">
         <div class="option-icon">😔</div>
-        <div class="option-text">Rarely — most don't convert 😔</div>
+        <div class="option-text">Almost always — most connections fade</div>
         <div class="radio-dot"></div>
       </div>
       <div class="radio-item" onclick="selectRadio(this)">
         <div class="option-icon">🤷</div>
-        <div class="option-text">Sometimes — but takes a lot of effort 😓</div>
-        <div class="radio-dot"></div>
-      </div>
-      <div class="radio-item" onclick="selectRadio(this)">
-        <div class="option-icon">📈</div>
-        <div class="option-text">Often — but still too slow ⏱️</div>
+        <div class="option-text">About half — I follow up on the "important" ones</div>
         <div class="radio-dot"></div>
       </div>
       <div class="radio-item" onclick="selectRadio(this)">
         <div class="option-icon">✅</div>
-        <div class="option-text">I have a system — want to scale it 📈</div>
+        <div class="option-text">Rarely — but follow-ups still feel like effort</div>
         <div class="radio-dot"></div>
       </div>
     </div>
@@ -620,118 +395,51 @@ textarea.wa-input::placeholder { color: var(--muted); }
   <div class="sticky-bottom">
     <div class="btn-row">
       <button class="btn-secondary" onclick="goTo(0)">← Back</button>
-      <button class="btn-primary" style="flex:2" onclick="goTo(3)">Next →</button>
+      <button class="btn-primary" style="flex:2" onclick="goTo(2)">Next →</button>
     </div>
   </div>
 </div>
 
-<!-- ===== SCREEN 3: Q3 ===== -->
-<div class="screen hidden" id="s4">
+<!-- ===== SCREEN 2: Q3 ===== -->
+<div class="screen hidden" id="s2">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot active"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
-<div class="scroll-content">
+  <div class="scroll-content">
     <div class="survey-card" style="margin-top:20px">
-      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:57%"></div></div>
-      <div class="q-label">Question 3 of 4</div>
-      <div class="q-text">What is the primary way your business connects with partners/clients?</div>
-      <div class="q-hint">Rank by usage — tap to assign 1st, 2nd, 3rd, 4th. Skip any you don't use.</div>
-      <div class="rank-items">
-        <div class="rank-item" onclick="rankChannel(this)" data-channel="wa">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">📱</div>
-          <div class="rank-text">WhatsApp</div>
-        </div>
-        <div class="rank-item" onclick="rankChannel(this)" data-channel="li">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">💼</div>
-          <div class="rank-text">LinkedIn</div>
-        </div>
-        <div class="rank-item" onclick="rankChannel(this)" data-channel="wali">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">🤝</div>
-          <div class="rank-text">WhatsApp &amp; LinkedIn equally</div>
-        </div>
-        <div class="rank-item" onclick="rankChannelHandle(this,&#39;ig&#39;)" data-channel="ig">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">📸</div>
-          <div class="rank-text">Instagram</div>
-        </div>
-        <div id="ig-handle-row" style="display:none;margin:-4px 0 4px;padding:0 4px">
-          <input id="ig-handle" type="text" placeholder="@yourhandle" style="width:100%;background:#fff;border:1.5px solid #009955;border-radius:10px;padding:10px 14px;font-size:14px;color:#2d3d35;outline:none;font-family:&#39;DM Sans&#39;,sans-serif">
-        </div>
-        <div class="rank-item" onclick="rankChannelHandle(this,&#39;x&#39;)" data-channel="x">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">𝕏</div>
-          <div class="rank-text">X / Twitter</div>
-        </div>
-        <div id="x-handle-row" style="display:none;margin:-4px 0 4px;padding:0 4px">
-          <input id="x-handle" type="text" placeholder="@yourhandle" style="width:100%;background:#fff;border:1.5px solid #009955;border-radius:10px;padding:10px 14px;font-size:14px;color:#2d3d35;outline:none;font-family:&#39;DM Sans&#39;,sans-serif">
-        </div>
-        <div class="rank-item" onclick="rankChannel(this)" data-channel="ev">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">🤝</div>
-          <div class="rank-text">In-person events</div>
-        </div>
-        <div class="rank-item" onclick="rankChannel(this)" data-channel="em">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">📧</div>
-          <div class="rank-text">Email</div>
-        </div>
-        <div class="rank-item" onclick="rankChannel(this)" data-channel="crm">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">📊</div>
-          <div class="rank-text">CRM / Database</div>
-        </div>
-      </div>
-      <div class="rank-item" onclick="rankChannel(this)" data-channel="all" style="border-color:rgba(184,144,42,0.4);background:#fffcf5;margin-top:4px">
-          <div class="rank-num" data-slot=""></div>
-          <div class="option-icon">✅</div>
-          <div class="rank-text" style="color:#FFD000;font-weight:600">All of the above</div>
-        </div>
-      <div style="font-size:11px;color:#009955;margin-top:10px;cursor:pointer;font-weight:600" onclick="resetRanks()">↺ Reset</div>
-    </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:71%"></div></div>
+      <div class="q-label">Question 3 of 3</div>
+      <div class="q-text">How do you currently manage new contacts after meeting?</div>
+      <div class="q-hint">Select all that apply</div>
 
-    <div class="survey-card" style="margin-top:12px">
-      <div class="q-label">Question 4 of 4</div>
-      <div class="q-text">How long does a typical outreach or connection take you — per contact?</div>
-      <div class="q-hint">Select one</div>
-      <div class="radio-item" onclick="selectRadio2(this)">
-        <div class="option-icon">⚡</div>
-        <div class="option-text">5–10 min — quick message, no real research</div>
-        <div class="radio-dot"></div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">📱</div>
+        <div class="option-text">WhatsApp — they're in my chats</div>
+        <div class="option-check"></div>
       </div>
-      <div class="radio-item" onclick="selectRadio2(this)">
-        <div class="option-icon">⏱️</div>
-        <div class="option-text">15–20 min — some research, personalized message</div>
-        <div class="radio-dot"></div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">💼</div>
+        <div class="option-text">LinkedIn — I connect and forget</div>
+        <div class="option-check"></div>
       </div>
-      <div class="radio-item selected" onclick="selectRadio2(this)">
-        <div class="option-icon">🕐</div>
-        <div class="option-text">30 min — proper research + crafting the right message</div>
-        <div class="radio-dot"></div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">📊</div>
+        <div class="option-text">CRM / spreadsheet</div>
+        <div class="option-check"></div>
       </div>
-      <div class="radio-item" onclick="selectRadio2(this)">
-        <div class="option-icon">😓</div>
-        <div class="option-text">45+ min — I go deep on context before reaching out</div>
-        <div class="radio-dot"></div>
+      <div class="option-item" onclick="toggleOption(this)">
+        <div class="option-icon">🧠</div>
+        <div class="option-text">Memory — I try to remember</div>
+        <div class="option-check"></div>
       </div>
     </div>
   </div>
   <div class="sticky-bottom">
     <div class="btn-row">
-      <button class="btn-secondary" onclick="goTo(2)">← Back</button>
+      <button class="btn-secondary" onclick="goTo(1)">← Back</button>
       <button class="btn-primary" style="flex:2" onclick="goTo(3)">See My Score →</button>
     </div>
   </div>
@@ -740,95 +448,74 @@ textarea.wa-input::placeholder { color: var(--muted); }
 <!-- ===== SCREEN 3: SCORE ===== -->
 <div class="screen hidden" id="s3">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot active"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
-<div class="scroll-content">
-    <!-- EMAIL FIRST — visible without scrolling -->
-    <div style="background:#fff;border:1px solid rgba(255,208,0,0.4);border-radius:16px;padding:16px;margin-top:16px;box-shadow:0 1px 4px rgba(0,0,0,0.05)">
-      <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:16px;font-weight:800;color:#2d4a38;margin-bottom:4px">✦ Get Your Free Intelligence Report</div>
-      <div style="font-size:12px;color:#666;margin-bottom:12px">Instant access to your Relationship Intelligence Agent</div>
-      <input class="email-input" type="email" placeholder="your@email.com" id="emailInput" style="margin-bottom:10px">
-      <button class="btn-primary" onclick="goTo(5)" style="padding:13px">✉️ Unlock Free Agent →</button>
-      <div style="font-size:10px;color:#999;text-align:center;margin-top:8px">No spam · Unsubscribe anytime</div>
-    </div>
-    <div class="skip-link" style="margin-top:10px;margin-bottom:4px"><a onclick="goTo(5)">Already have access? Skip →</a></div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px" class="fade-up fade-up-1">
-      <div class="score-card" style="margin-top:0">
-        <div class="score-badge">AI Score</div>
-        <div class="score-num">87</div>
-        <div class="score-label">High-Impact</div>
-        <div class="progress-pill"><div class="progress-pill-fill"></div></div>
-        <div class="score-desc" style="margin-top:8px;font-size:11px">You're leaving real collab opportunities on the table.</div>
-      </div>
-      <div class="time-card" style="margin-top:0">
-        <div class="time-label">⏱ Time saved</div>
-        <div class="time-num" style="font-size:48px">6<span style="font-size:22px">hrs</span></div>
-        <div class="time-sub-pill" style="font-size:13px;padding:8px 14px">per week — yours back</div>
-        <div class="time-divider"></div>
-        <span class="time-tag" style="font-size:10px">~2 hrs research</span>
-        <span class="time-tag" style="font-size:10px">~2 hrs writing</span>
-        <span class="time-tag" style="font-size:10px">~1 hr scheduling</span>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:10px">
-      <div style="display:inline-block;background:#FFD000;color:#1a1a1a;font-family:&#39;Syne&#39;,sans-serif;font-size:13px;font-weight:700;padding:9px 20px;border-radius:100px">30 seconds per contact, not 30 minutes</div>
+  <div class="scroll-content">
+    <div class="score-card fade-up fade-up-1">
+      <div class="score-badge">AI Automation Readiness</div>
+      <div class="score-num">87</div>
+      <div class="score-label">High-Impact Candidate</div>
+      <div class="progress-pill"><div class="progress-pill-fill"></div></div>
+      <div class="score-desc" style="margin-top:12px">Based on your responses — you're leaving serious time and opportunity on the table.</div>
     </div>
 
+    <div class="time-card fade-up fade-up-2">
+      <div class="time-label">⏱ Estimated time you could save</div>
+      <div class="time-num">6<span>hrs</span></div>
+      <div class="time-sub">per week — back in your hands</div>
+      <div class="time-divider"></div>
+      <span class="time-tag">~2 hrs researching contacts</span>
+      <span class="time-tag">~2 hrs writing follow-ups</span>
+      <span class="time-tag">~1 hr scheduling</span>
+      <span class="time-tag">~1 hr chasing dropped balls</span>
+    </div>
 
+    <div class="email-section fade-up fade-up-3">
+      <div style="font-size:24px;margin-bottom:10px">📊</div>
+      <div class="email-title">Get Your Full AI Automation Readiness Report</div>
+      <div class="email-desc">A personalized breakdown of where AI can save you the most time — plus instant access to your free Relationship Intelligence Agent.</div>
+      <input class="email-input" type="email" placeholder="your@email.com" id="emailInput">
+      <button class="btn-primary" onclick="goTo(4)">✉️ &nbsp;Send My Report + Unlock Free Agent</button>
+      <div class="fine-print">No spam. Unsubscribe anytime. Your agent is ready immediately after.</div>
+    </div>
+    <div class="skip-link"><a onclick="goTo(4)">Already have access? Skip → Build My Agent Now</a></div>
   </div>
 </div>
 
 <!-- ===== SCREEN 4: CHANNEL SELECT ===== -->
-<div class="screen hidden" id="s5">
+<div class="screen hidden" id="s4">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot active"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
-<div class="scroll-content">
+  <div class="scroll-content">
     <div style="margin-top:24px">
       <div class="hero-tag" style="margin-top:0">Set Up Your Agent</div>
-      <h1 class="hero" style="font-size:28px">How does your business<br><span class="accent">connect with partners?</span></h1>
-      <p class="hero-sub">Choose your primary channel. Venn's 5 agents will calibrate to how you actually work.</p>
+      <h1 class="hero" style="font-size:28px">How does your business<br><span class="accent">connect & close?</span></h1>
+      <p class="hero-sub">Choose your primary channel. LevelUp's 5 agents will calibrate to how you actually work.</p>
 
       <div class="channel-grid">
-        <div class="channel-card selected" id="ch-wa" onclick="selectChannel(&#39;wa&#39;)">
+        <div class="channel-card selected" id="ch-wa" onclick="selectChannel('wa')">
           <div class="channel-icon">💬</div>
           <div class="channel-name">WhatsApp</div>
           <div class="channel-desc">Chat history + contacts → instant intel</div>
         </div>
-        <div class="channel-card" id="ch-li" onclick="selectChannel(&#39;li&#39;)">
+        <div class="channel-card" id="ch-li" onclick="selectChannel('li')">
           <div class="channel-icon">💼</div>
           <div class="channel-name">LinkedIn</div>
           <div class="channel-desc">Profile URL → research + pitch angles</div>
         </div>
-        <div class="channel-card" id="ch-ig" onclick="selectChannel(&#39;ig&#39;)">
+        <div class="channel-card" id="ch-ig" onclick="selectChannel('ig')">
           <div class="channel-icon">📸</div>
           <div class="channel-name">Instagram</div>
           <div class="channel-desc">DMs + profile → collab intelligence</div>
         </div>
-        <div class="channel-card" id="ch-csv" onclick="selectChannel(&#39;csv&#39;)">
+        <div class="channel-card" id="ch-csv" onclick="selectChannel('csv')">
           <div class="channel-icon">📊</div>
           <div class="channel-name">CRM / CSV</div>
           <div class="channel-desc">Import contacts → bulk analysis</div>
@@ -836,139 +523,71 @@ textarea.wa-input::placeholder { color: var(--muted); }
       </div>
 
       <div style="margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.5">
-        ✦ <strong style="color:var(--lu)">WhatsApp-first</strong> selected — Venn will use your chat history as the primary relationship signal, enriched with LinkedIn + web via Hybrid RAG.
+        ✦ <strong style="color:var(--lu)">WhatsApp-first</strong> selected — LevelUp will use your chat history as the primary relationship signal, enriched with LinkedIn + web via Hybrid RAG.
       </div>
     </div>
   </div>
   <div class="sticky-bottom">
-    <button class="btn-lu" onclick="goTo(6)" id="channel-btn-primary">Continue with WhatsApp →</button>
-    <button class="btn-lu" onclick="goTo(6)" id="channel-btn-li" style="margin-top:10px;background:#5b9bd5;font-weight:500">Continue with LinkedIn →</button>
+    <button class="btn-lu" onclick="goTo(5)">Continue with WhatsApp →</button>
   </div>
 </div>
 
 <!-- ===== SCREEN 5: INPUT ===== -->
-<div class="screen hidden" id="s6">
+<div class="screen hidden" id="s5">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot active"></div>
-      <div class="dot"></div>
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
-<div class="scroll-content">
+  <div class="scroll-content">
     <div style="margin-top:20px">
-      <div style="margin-bottom:20px">
-        <div class="hero-tag" style="margin-top:0;margin-bottom:10px">✦ Step 1 of 2 — Load Your Contact</div>
-        <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:22px;font-weight:800;color:#2d4a38;line-height:1.2;margin-bottom:6px">Add Your<br><span style="color:#009955">Connections</span></div>
-        <div style="font-size:13px;color:#555;line-height:1.5">Paste a WhatsApp chat, enter a LinkedIn URL, or import from CSV — your 5 agents will do the rest.</div>
+      <div class="hero-tag" style="margin-top:0;margin-bottom:14px">Analyze a Contact</div>
+
+      <div class="input-label">WhatsApp Chat History</div>
+      <div class="sample-btn" onclick="loadSample()">✦ Load sample conversation</div>
+      <textarea class="wa-input" id="waText" placeholder="Paste your WhatsApp export here...&#10;&#10;[12/03/25, 3:42 PM] Sarah: Great meeting you at SaaStr!&#10;[12/03/25, 3:44 PM] You: Loved your talk on founder-led sales..."></textarea>
+      <div class="input-hint">
+        📱 <strong style="color:var(--text)">Export from WhatsApp:</strong> Open chat → ⋯ → More → Export Chat (without media)<br><br>
+        <a href="#">Install PWA</a> to share directly from WhatsApp in 1 tap ↗
       </div>
 
-      <!-- SECTION 1: WHATSAPP -->
-      <div style="background:#f4faf6;border:1.5px solid rgba(0,153,85,0.2);border-radius:16px;padding:16px;margin-bottom:14px">
-        <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:14px;font-weight:800;color:#006633;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:18px">💬</span> WhatsApp
-        </div>
-        <div class="input-label" style="margin-bottom:4px">Chat History <span style="color:#e05555">*</span></div>
-        <div class="sample-btn" onclick="loadSample()" style="margin-bottom:6px">✦ Load sample conversation</div>
-        <textarea class="wa-input" id="waText" placeholder="Paste your WhatsApp export here...
+      <div class="input-label">LinkedIn URL or Website</div>
+      <input class="text-input" type="text" placeholder="linkedin.com/in/... or company.com" id="linkedinUrl">
+      <div class="input-hint">💡 LinkedIn or website — LevelUp's Exploratory Agent researches the rest via Hybrid RAG</div>
 
-[12/03/25, 3:42 PM] Sarah: Great meeting you at SaaStr!
-[12/03/25, 3:44 PM] You: Loved your talk on founder-led sales..." style="margin-bottom:10px"></textarea>
-        <div style="display:flex;gap:8px;align-items:flex-start">
-          <div style="flex:1">
-            <div class="input-label" style="margin-bottom:4px">WhatsApp # <span style="color:#e05555">*</span></div>
-            <input class="text-input" type="tel" placeholder="+1 555 000 0000" id="waPhone" style="margin-bottom:0">
-          </div>
-          <div style="flex:1.5;padding-top:22px">
-            <div class="input-hint" style="margin-bottom:0">📱 Open WA → ⋯ → More → Export Chat<br><a href="file:///Users/christinasalib/Downloads/venn-demo.html#" onclick="installPWA();return false;" style="color:#009955;font-weight:600">Install PWA</a> to share in 1 tap ↗</div>
-          </div>
-        </div>
+      <div class="input-label">Contact Name</div>
+      <input class="text-input" type="text" placeholder="e.g. Sarah Chen" id="contactName">
+
+      <div class="input-label">Title</div>
+      <input class="text-input" type="text" placeholder="e.g. Head of Partnerships" id="contactTitle">
+
+      <div class="input-label">Company</div>
+      <input class="text-input" type="text" placeholder="e.g. Sequoia Capital" id="contactCompany">
+
+      <div class="input-label">Scheduling preference</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <div class="tone-chip selected" onclick="toggleChip(this,'sched')">📅 Google Cal</div>
+        <div class="tone-chip" onclick="toggleChip(this,'sched')">📅 Calendly</div>
+        <div class="tone-chip" onclick="toggleChip(this,'sched')">💬 WhatsApp</div>
+        <div class="tone-chip" onclick="toggleChip(this,'sched')">🎥 Zoom</div>
       </div>
-
-      <!-- SECTION 2: LINKEDIN CONTEXT -->
-      <div style="background:#f4faf6;border:1.5px solid rgba(0,153,85,0.2);border-radius:16px;padding:16px;margin-bottom:14px">
-        <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:14px;font-weight:800;color:#006633;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:18px">💼</span> Add LinkedIn Context
-        </div>
-        <!-- ALL FIELDS IN ONE ROW -->
-        <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:8px;align-items:end">
-          <div>
-            <div class="input-label" style="margin-bottom:4px">LinkedIn URL <span style="color:#e05555">*</span></div>
-            <input class="text-input" type="text" placeholder="linkedin.com/in/..." id="linkedinUrl" oninput="updateLinkedInPreview(this.value)" style="margin-bottom:0">
-          </div>
-          <div>
-            <div class="input-label" style="margin-bottom:4px">Name</div>
-            <input class="text-input" type="text" placeholder="Full name" id="contactName" style="margin-bottom:0">
-          </div>
-          <div>
-            <div class="input-label" style="margin-bottom:4px">Title</div>
-            <input class="text-input" type="text" placeholder="VP Partnerships" id="contactTitle" style="margin-bottom:0">
-          </div>
-          <div>
-            <div class="input-label" style="margin-bottom:4px">Company</div>
-            <input class="text-input" type="text" placeholder="Sequoia" id="contactCompany" style="margin-bottom:0">
-          </div>
-        </div>
-        <div style="margin-top:6px">
-          <div class="input-label" style="margin-bottom:4px">Website <span style="font-size:9px;color:#888;text-transform:none;letter-spacing:0">(optional)</span></div>
-          <input class="text-input" type="text" placeholder="company.com" id="websiteUrl" style="margin-bottom:0">
-        </div>
-        <div class="input-hint" style="margin-top:6px;margin-bottom:0">💡 LinkedIn URL required · Exploratory Agent researches the rest via Hybrid RAG</div>
-      </div>
-
-      <!-- CSV UPLOAD -->
-      <div style="background:#f5faf7;border:2px dashed rgba(0,153,85,0.3);border-radius:14px;padding:16px;margin-bottom:14px;text-align:center" id="csv-drop-zone">
-        <div style="font-size:22px;margin-bottom:6px">📊</div>
-        <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:14px;font-weight:700;color:#007a3d;margin-bottom:4px">Import from CSV</div>
-        <div style="font-size:11px;color:#666;margin-bottom:12px;line-height:1.5">HubSpot · Salesforce · Clay · Apollo · Alloy<br>Any CSV with a LinkedIn URL column</div>
-        <label style="display:inline-block;background:#009955;color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">
-          Upload CSV
-          <input type="file" accept=".csv" onchange="parseCSV(event)" style="display:none">
-        </label>
-        <div style="font-size:10px;color:#aaa;margin-top:8px">or drag &amp; drop</div>
-      </div>
-
-      <!-- CSV RESULTS -->
-      <div id="csv-results" style="display:none;margin-bottom:14px">
-        <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#009955;margin-bottom:8px">Contacts found — tap to analyze</div>
-        <div id="csv-contact-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto"></div>
-        <div id="csv-count" style="font-size:11px;color:#888;margin-top:6px;text-align:right"></div>
-      </div>
-
-
-
-
     </div>
   </div>
   <div class="sticky-bottom">
-    <button class="btn-lu" onclick="startAnalysis()" style="font-size:17px;padding:18px">✦ Generate Intelligence →</button>
+    <button class="btn-lu" onclick="startAnalysis()">✦ Generate Intelligence →</button>
   </div>
 </div>
 
 <!-- ===== SCREEN 6: LOADING ===== -->
-<div class="screen hidden" id="s7">
+<div class="screen hidden" id="s6">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot active"></div>
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
-<div class="scroll-content" style="display:flex;flex-direction:column;justify-content:center;min-height:70vh">
+  <div class="scroll-content" style="display:flex;flex-direction:column;justify-content:center;min-height:70vh">
     <div class="loading-ring"></div>
     <div class="loading-title">Building your<br>Relationship Agent</div>
     <div class="loading-sub">Personalizing based on your responses...</div>
@@ -977,7 +596,7 @@ textarea.wa-input::placeholder { color: var(--muted); }
         <div class="agent-icon" id="lai0">🔭</div>
         <div>
           <div class="agent-name" id="ls0">Exploratory Agent</div>
-          <div class="agent-desc" id="lsd0">Researching <span id="lsName">your contact</span> — LinkedIn + web signals</div>
+          <div class="agent-desc" id="lsd0">Researching <span id="lsName">Sarah Chen</span> — LinkedIn + web signals</div>
         </div>
         <div class="agent-status" id="lss0"></div>
       </div>
@@ -1018,74 +637,59 @@ textarea.wa-input::placeholder { color: var(--muted); }
 </div>
 
 <!-- ===== SCREEN 7: OUTPUT ===== -->
-<div class="screen hidden" id="s8">
+<div class="screen hidden" id="s7">
   <div class="top-bar">
-    <div class="logo" onclick="resetDemo()" style="cursor:pointer"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px;flex-shrink:0"><rect width="22" height="22" rx="6" fill="#009955"></rect><path d="M7 14.5L11 8.5L15 14.5" stroke="#FFD000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 11L11 5L15 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path></svg>Venn<span>.ai</span></div>
+    <div class="logo">LevelUp<span>.ai</span></div>
     <div class="progress-dots">
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
-      <div class="dot done"></div>
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
     </div>
-    <button class="try-demo-btn" onclick="resetDemo()">Try Demo</button>
   </div>
-<div class="scroll-content">
+  <div class="scroll-content">
 
     <div class="usage-bar fade-up fade-up-1">
       <div class="usage-dot"></div>
-      <div class="usage-text">◎ <strong>1 of 3</strong> free contacts used</div>
+      <div class="usage-text">⚡ <strong>1 of 3</strong> free contacts used</div>
       <div class="tier-badge">Free Tier</div>
     </div>
 
     <div class="section-head fade-up fade-up-1">
       <div class="section-icon">👤</div>
-      <div class="section-title">Your Personalized Connection</div>
+      <div class="section-title">Contact Detected</div>
       <div class="section-line"></div>
     </div>
     <div class="contact-card fade-up fade-up-2">
       <div class="contact-avatar">👩</div>
       <div>
-        <div class="contact-name" id="outName">Your Contact</div>
-        <div class="contact-role" id="outRole">New connection</div>
-        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
-          <span id="outLiBadge" style="background:#f0faf5;border:1px solid rgba(0,153,85,0.3);border-radius:6px;padding:2px 8px;font-size:11px;color:#007a3d;font-weight:600">💼 LinkedIn</span>
-          <span style="background:#f0faf5;border:1px solid rgba(0,153,85,0.3);border-radius:6px;padding:2px 8px;font-size:11px;color:#007a3d;font-weight:600">💬 WA: 87% match</span>
-        </div>
+        <div class="contact-name" id="outName">Sarah Chen</div>
+        <div class="contact-role">Head of Partnerships · Sequoia Capital · Met at SaaStr 2025</div>
       </div>
       <div class="new-badge">New ✓</div>
     </div>
 
-    <div class="output-section fade-up fade-up-2">
-    <div class="section-head">
+    <div class="section-head fade-up fade-up-2">
       <div class="section-icon">🔍</div>
       <div class="section-title">Top 3 Key Facts</div>
       <div class="section-line"></div>
     </div>
-    <div class="facts-card">
+    <div class="facts-card fade-up fade-up-3">
       <div class="fact-item">
         <div class="fact-num">1</div>
         <div class="fact-text">Led Sequoia's $50M Series B into Rippling — deep expertise in HR-tech and workforce automation at SMB scale.</div>
-        <div class="source-pills"><a href="file:///Users/christinasalib/Downloads/venn-demo.html" id="src-li-1" target="_blank" class="src-pill src-link">💼 LinkedIn ↗</a><a href="https://www.google.com/search?q=sequoia+capital" id="src-site-1" target="_blank" class="src-pill src-link">🌐 Sequoia Portfolio ↗</a></div>
+        <div class="source-pills"><span class="src-pill">💼 LinkedIn</span><span class="src-pill">🌐 Sequoia Portfolio</span></div>
       </div>
       <div class="fact-item">
         <div class="fact-num">2</div>
         <div class="fact-text">Co-hosts "Operators Only" podcast — 40k listeners, B2B SaaS GTM focus. Actively seeking founder guests.</div>
-        <div class="source-pills"><a href="https://www.google.com/search?q=podcast" id="src-pod-1" target="_blank" class="src-pill src-link">🎙️ Spotify ↗</a><a href="https://linkedin.com/" id="src-li-posts-1" target="_blank" class="src-pill src-link">📝 LinkedIn Posts ↗</a></div>
+        <div class="source-pills"><span class="src-pill">🎙️ Spotify</span><span class="src-pill">📝 LinkedIn Posts</span></div>
       </div>
       <div class="fact-item">
         <div class="fact-num">3</div>
         <div class="fact-text">Travels to NYC monthly for LP meetings — mentioned at SaaStr. Good window for in-person coffee this month.</div>
-        <div class="source-pills"><a href="https://linkedin.com/" id="src-li-act-1" target="_blank" class="src-pill src-link">📍 LinkedIn Activity ↗</a><a href="https://www.google.com/search?q=saastr+2025" id="src-saastr-1" target="_blank" class="src-pill src-link">🎤 SaaStr Profile ↗</a></div>
+        <div class="source-pills"><span class="src-pill">📍 LinkedIn Activity</span><span class="src-pill">🎤 SaaStr Profile</span></div>
       </div>
     </div>
-    </div>
 
-    <div class="output-section fade-up fade-up-3">
-    <div class="section-head">
+    <div class="section-head fade-up fade-up-3">
       <div class="section-icon">💡</div>
       <div class="section-title">Top 3 Talking Points</div>
       <div class="section-line"></div>
@@ -1093,7 +697,7 @@ textarea.wa-input::placeholder { color: var(--muted); }
 
     <div class="talking-card fade-up fade-up-4">
       <div class="tp-label"><div class="tp-num">1</div> Shared Thesis</div>
-      <div class="tp-text">Reference her Rippling investment — segue into how Venn automates the relationship intelligence layer she's backing at SMB scale.</div>
+      <div class="tp-text">Reference her Rippling investment — segue into how LevelUp automates the relationship intelligence layer she's backing at SMB scale.</div>
       <div class="tp-quote">
         <div class="tp-quote-text">💬 "Loved your take on founder-led sales at SaaStr — it maps directly to what we're seeing with SMBs automating outreach..."</div>
       </div>
@@ -1112,32 +716,28 @@ textarea.wa-input::placeholder { color: var(--muted); }
         <div class="tp-quote-text">💬 "Are you in NYC this month? I'll be there the 18th–20th — coffee at Bluestone would be great..."</div>
       </div>
     </div>
-    </div>
 
-    <div class="output-section fade-up fade-up-4">
-    <div class="section-head">
+    <div class="section-head fade-up fade-up-4">
       <div class="section-icon">✅</div>
       <div class="section-title">Action Items from Chat</div>
       <div class="section-line"></div>
     </div>
     <div class="action-item fade-up fade-up-4">
-      <div class="action-check" onclick="this.classList.toggle(&#39;checked&#39;)"></div>
+      <div class="action-check"></div>
       <div>
-        <div class="action-text">Send Sarah the Venn demo link she asked for at SaaStr</div>
+        <div class="action-text">Send Sarah the LevelUp demo link she asked for at SaaStr</div>
         <div class="action-meta">💬 WhatsApp · 3 days ago · High priority</div>
       </div>
     </div>
     <div class="action-item fade-up fade-up-5">
-      <div class="action-check" onclick="this.classList.toggle(&#39;checked&#39;)"></div>
+      <div class="action-check"></div>
       <div>
         <div class="action-text">Intro Sarah to Marcus Webb at a16z re: AI infrastructure portfolio</div>
         <div class="action-meta">💬 WhatsApp · 3 days ago</div>
       </div>
     </div>
-    </div>
 
-    <div class="output-section fade-up fade-up-5">
-    <div class="section-head">
+    <div class="section-head fade-up fade-up-5">
       <div class="section-icon">✍️</div>
       <div class="section-title">Your Follow-Up Message</div>
       <div class="section-line"></div>
@@ -1168,18 +768,11 @@ textarea.wa-input::placeholder { color: var(--muted); }
       </div>
       <div class="tone-label">Additional Feedback</div>
       <div class="feedback-row">
-        <textarea class="feedback-input" placeholder="e.g. &quot;Lead with the podcast angle and make it shorter&quot;..."></textarea>
-        <div class="mic-btn" onclick="startVoiceInput(this)" id="mic-feedback-btn" title="Tap to speak your feedback">🎙️</div>
+        <textarea class="feedback-input" placeholder='e.g. "Lead with the podcast angle and make it shorter"...'></textarea>
+        <div class="mic-btn">🎙️</div>
       </div>
-      <div class="voice-link" style="margin-bottom:10px;color:#007a3d">🎙️ Tap mic to give feedback by voice</div>
-      <button class="btn-regen" onclick="regenMessage()">✨ Regenerate Message</button>
-    </div>
-    </div><!-- close output-section draft -->
-
-    <div style="padding:16px 0 8px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#009955;margin-bottom:10px">Send Your Message</div>
-      <button class="btn-lu" style="margin-bottom:8px" onclick="sendWA()">✅ Send via WhatsApp</button>
-      <button class="btn-lu" style="margin-bottom:8px;background:#5b9bd5;font-weight:500" onclick="sendLinkedIn()">💼 Send via LinkedIn</button>
+      <div class="voice-link" style="margin-bottom:10px">Tap mic to give feedback by voice</div>
+      <button class="btn-regen">✨ Regenerate Message</button>
     </div>
 
     <div class="section-head" style="margin-top:24px">
@@ -1188,140 +781,160 @@ textarea.wa-input::placeholder { color: var(--muted); }
       <div class="section-line"></div>
     </div>
     <div class="sched-grid">
-      <div class="sched-btn" onclick="window.open(&#39;https://calendly.com&#39;,&#39;_blank&#39;)">📅 Calendly ↗</div>
-      <div class="sched-btn" onclick="window.open(&#39;https://calendar.google.com/calendar/r/eventedit&#39;,&#39;_blank&#39;)">📅 Google Cal ↗</div>
-      <div class="sched-btn" onclick="sendWA()">💬 WhatsApp ↗</div>
-      <div class="sched-btn" onclick="window.open(&#39;https://zoom.us/meeting/schedule&#39;,&#39;_blank&#39;)">🎥 Zoom ↗</div>
+      <div class="sched-btn">📅 Calendly</div>
+      <div class="sched-btn">📅 Google Cal</div>
+      <div class="sched-btn">💬 WhatsApp</div>
+      <div class="sched-btn">🎥 Zoom</div>
     </div>
     <button class="btn-lu" style="margin-top:12px" onclick="sendWA()">✅ Send via WhatsApp</button>
-    <button class="btn-lu" style="margin-top:8px;background:#0a66c2" onclick="sendLinkedIn()">💼 Send via LinkedIn</button>
 
     <!-- PRICING -->
     <div id="pricing-section" style="margin-top:16px">
 
+      <!-- Header -->
       <div style="text-align:center;margin-bottom:20px">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(184,144,42,0.10);border:1px solid rgba(184,144,42,0.3);border-radius:20px;padding:6px 16px;font-size:11px;font-weight:600;color:#9a6f1a;margin-bottom:12px">✦ You're 1 insight away from closing this</div>
-        <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:22px;font-weight:800;color:#1a1a1a;line-height:1.3">Unlock the full<br><span style="color:#009955">Relationship Intelligence Agent</span></div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(212,168,67,0.12);border:1px solid var(--gold-border);border-radius:20px;padding:6px 16px;font-size:11px;font-weight:600;color:var(--gold2);margin-bottom:12px">✦ You're 1 insight away from closing this</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1.2">Unlock the full<br><span style="color:var(--lu)">Relationship Intelligence Agent</span></div>
       </div>
 
-      <!-- FREE -->
-      <div class="pricing-card" style="margin-bottom:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div>
-            <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f5d080;margin-bottom:2px">Freemium</div>
-            <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1">Free<span style="font-size:13px;font-weight:400;color:#FFD000"> forever</span></div>
+      <!-- Toggle -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px">
+        <span id="tog-ind" style="font-size:13px;font-weight:600;color:var(--lu);cursor:pointer" onclick="showTiers('individual')">Individual</span>
+        <div id="tog-track" onclick="toggleTierView()" style="width:44px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;cursor:pointer;position:relative;transition:all 0.2s">
+          <div id="tog-thumb" style="width:18px;height:18px;background:var(--lu);border-radius:50%;position:absolute;top:2px;left:3px;transition:all 0.3s"></div>
+        </div>
+        <span id="tog-team" style="font-size:13px;font-weight:600;color:var(--muted);cursor:pointer" onclick="showTiers('team')">Teams</span>
+      </div>
+
+      <!-- INDIVIDUAL TIERS -->
+      <div id="tiers-individual">
+
+        <!-- FREE -->
+        <div class="pricing-card" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Free</div>
+              <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;line-height:1">$0<span style="font-size:13px;font-weight:400;color:var(--muted)">/mo</span></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid var(--faint);border-radius:8px;padding:4px 12px;font-size:11px;color:var(--muted)">Current plan</div>
           </div>
-          <div style="background:#f0f2f0;border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:5px 12px;font-size:11px;color:#888;font-weight:600">Current plan</div>
+          <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text">Unlimited contacts — <strong>30-sec quick analysis</strong></span></div>
+          <div class="pf-row"><span class="pf-icon">💡</span><span class="pf-text">3 talking points per contact</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">Deep Hybrid RAG analysis</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">AI draft in your voice</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">WhatsApp full history analysis</span></div>
         </div>
-        <div class="pf-row"><span class="pf-icon">👤</span><span class="pf-text"><strong>3 contacts/mo</strong> — quick 30-sec analysis</span></div>
-        <div class="pf-row"><span class="pf-icon">💡</span><span class="pf-text">3 talking points per contact</span></div>
-        <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">Deep Hybrid RAG · Voice draft · WA history</span></div>
+
+        <!-- PRO — FEATURED -->
+        <div class="pricing-card pricing-featured" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="background:var(--grad-gold);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:#000">MOST POPULAR</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold2)">Pro</div>
+          </div>
+
+          <!-- Billing toggle -->
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <div id="bill-mo" class="bill-chip" onclick="setBilling('monthly')">Monthly</div>
+            <div id="bill-qtr" class="bill-chip bill-active" onclick="setBilling('quarterly')">Quarterly <span style="background:rgba(0,230,118,0.2);color:var(--lu);border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px">Save 10%</span></div>
+          </div>
+
+          <div style="margin-bottom:14px">
+            <div id="price-display" style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--lu);line-height:1">$8.99<span id="price-period" style="font-size:14px;font-weight:400;color:var(--muted);-webkit-text-fill-color:var(--muted)">/mo</span></div>
+            <div id="price-sub" style="font-size:11px;color:var(--muted);margin-top:3px">Billed $26.99/quarter · cancel anytime</div>
+          </div>
+
+          <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text"><strong>Unlimited contacts</strong> — full deep analysis</span></div>
+          <div class="pf-row"><span class="pf-icon">🔭</span><span class="pf-text">Exploratory Agent — full web + LinkedIn research</span></div>
+          <div class="pf-row"><span class="pf-icon">📊</span><span class="pf-text">RAG Agent — Top 5 Key Facts (vs 3 on Free)</span></div>
+          <div class="pf-row"><span class="pf-icon">🎙️</span><span class="pf-text">Voice Agent — draft in your voice, 9 tone styles</span></div>
+          <div class="pf-row"><span class="pf-icon">💬</span><span class="pf-text">Full WhatsApp history analysis</span></div>
+          <div class="pf-row"><span class="pf-icon">📅</span><span class="pf-text">Scheduling Agent — Calendly, GCal, Zoom</span></div>
+          <div class="pf-row"><span class="pf-icon">🧠</span><span class="pf-text">Relationship memory — context builds over time</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">CRM sync (Teams+)</span></div>
+
+          <button class="btn-amber" style="margin-top:16px" onclick="alert('Starting free trial...')">⚡ Start Free Trial — No Card Required</button>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">14-day free trial · Less than a coffee ☕</div>
+        </div>
+
       </div>
 
-      <!-- INDIVIDUAL -->
-      <div class="pricing-card" style="margin-bottom:10px;border-color:rgba(0,153,85,0.2)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f5d080">Individual</div>
+      <!-- TEAM TIERS -->
+      <div id="tiers-team" style="display:none">
+
+        <!-- TEAMS -->
+        <div class="pricing-card pricing-featured" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="background:var(--grad-gold);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:#000">TEAMS</div>
+            <div style="font-size:11px;color:var(--muted)">Up to 5 seats</div>
+            <div style="margin-left:auto;font-size:11px;color:var(--lu);font-weight:600">$8/seat</div>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--lu);line-height:1;margin-bottom:4px">$39.99<span style="font-size:14px;font-weight:400;color:var(--muted);-webkit-text-fill-color:var(--muted)">/mo</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Billed monthly · cancel anytime</div>
+
+          <div class="pf-row"><span class="pf-icon">👥</span><span class="pf-text"><strong>5 seats</strong> — shared team workspace</span></div>
+          <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text">Unlimited contacts across all seats</span></div>
+          <div class="pf-row"><span class="pf-icon">📊</span><span class="pf-text">Shared contact library + team analytics</span></div>
+          <div class="pf-row"><span class="pf-icon">🔗</span><span class="pf-text">LinkedIn auto-import of new connections</span></div>
+          <div class="pf-row"><span class="pf-icon">🧠</span><span class="pf-text">Relationship memory per seat</span></div>
+          <div class="pf-row"><span class="pf-icon">🔔</span><span class="pf-text">Proactive nudges when contacts go cold</span></div>
+          <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">CRM sync — HubSpot, Salesforce (Enterprise)</span></div>
+
+          <button class="btn-lu" style="margin-top:16px" onclick="alert('Starting team trial...')">Start Team Free Trial →</button>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">14-day free trial · No card required</div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1">$8.99<span style="font-size:13px;font-weight:400;color:rgba(245,230,200,0.7)">/mo</span></div>
-          <div style="font-size:11px;color:rgba(245,230,200,0.7);text-align:right">10 contacts/mo<br>billed monthly</div>
+
+        <!-- ENTERPRISE -->
+        <div class="pricing-card" style="margin-bottom:10px;border-color:var(--gold-border)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="background:rgba(212,168,67,0.15);border:1px solid var(--gold-border);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--gold2)">ENTERPRISE</div>
+            <div style="font-size:11px;color:var(--muted)">10+ seats</div>
+            <div style="margin-left:auto;font-size:11px;color:var(--gold2);font-weight:600">$8/seat</div>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--gold2);line-height:1;margin-bottom:4px">$79.99<span style="font-size:14px;font-weight:400;color:var(--muted)">/mo</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Billed monthly · annual available</div>
+
+          <div class="pf-row"><span class="pf-icon">👥</span><span class="pf-text"><strong>10+ seats</strong> — unlimited scaling</span></div>
+          <div class="pf-row"><span class="pf-icon">📊</span><span class="pf-text">CRM sync — Salesforce, HubSpot, GoHighLevel</span></div>
+          <div class="pf-row"><span class="pf-icon">🔒</span><span class="pf-text">RLS security + SSO + audit logs</span></div>
+          <div class="pf-row"><span class="pf-icon">🌐</span><span class="pf-text">WhatsApp Business API integration</span></div>
+          <div class="pf-row"><span class="pf-icon">⚡</span><span class="pf-text">Zapier webhook — 5,000+ tool integrations</span></div>
+          <div class="pf-row"><span class="pf-icon">🎯</span><span class="pf-text">Dedicated CSM + onboarding + SLA</span></div>
+
+          <button class="btn-amber" style="margin-top:16px" onclick="alert('Contacting sales...')">Contact Sales →</button>
         </div>
-        <div class="pf-row"><span class="pf-icon">👤</span><span class="pf-text"><strong>10 contacts/mo</strong> — full analysis</span></div>
-        <div class="pf-row"><span class="pf-icon">💡</span><span class="pf-text">3 talking points + 3 collab opportunities</span></div>
-        <div class="pf-row"><span class="pf-icon">💬</span><span class="pf-text">AI follow-up draft</span></div>
-        <div class="pf-row"><span class="pf-icon">📅</span><span class="pf-text">1-click scheduling</span></div>
-        <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">Voice Agent · Deep RAG · WA history</span></div>
-        <button class="btn-gold" style="margin-top:14px" onclick="alert(&#39;Starting Individual trial...&#39;)">Start Free Trial →</button>
+
       </div>
 
-      <!-- PRO — FEATURED -->
-      <div class="pricing-card pricing-featured" style="margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="background:#009955;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:#fff">MOST POPULAR</div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#007a3d">Pro</div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1">$29.99<span style="font-size:13px;font-weight:400;color:rgba(245,230,200,0.7)">/mo</span></div>
-          <div style="font-size:11px;color:rgba(245,230,200,0.7);text-align:right">Unlimited contacts<br>billed monthly</div>
-        </div>
-        <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text"><strong>Unlimited contacts</strong> — full deep analysis</span></div>
-        <div class="pf-row"><span class="pf-icon">🔭</span><span class="pf-text">Exploratory Agent — full web + LinkedIn research</span></div>
-        <div class="pf-row"><span class="pf-icon">📊</span><span class="pf-text">RAG Agent — Top 5 Key Facts (Hybrid RAG)</span></div>
-        <div class="pf-row"><span class="pf-icon">🎙️</span><span class="pf-text">Voice Agent — draft in your voice, 10 tone styles</span></div>
-        <div class="pf-row"><span class="pf-icon">💬</span><span class="pf-text">Full WhatsApp history analysis</span></div>
-        <div class="pf-row"><span class="pf-icon">📅</span><span class="pf-text">Scheduling Agent — Calendly, GCal, Zoom</span></div>
-        <div class="pf-row pf-locked"><span class="pf-icon">🔒</span><span class="pf-text pf-dim">CRM sync · Relationship memory (Premium+)</span></div>
-        <button class="btn-gold" style="margin-top:14px" onclick="alert(&#39;Starting Pro trial...&#39;)">✦ Start Free Trial — No Card Required</button>
-        <div style="font-size:11px;color:rgba(245,230,200,0.7);text-align:center;margin-top:8px">14-day free trial · Less than a coffee ☕</div>
-      </div>
-
-      <!-- PREMIUM -->
-      <div class="pricing-card" style="margin-bottom:10px;border-color:rgba(184,144,42,0.4);background:#fdfcf8">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="background:linear-gradient(135deg,#FFD000,#d4a843);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:#fff">PREMIUM</div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1">$129<span style="font-size:13px;font-weight:400;color:rgba(245,230,200,0.7)">/mo</span></div>
-          <div style="font-size:11px;color:rgba(245,230,200,0.7);text-align:right">Unlimited contacts<br>+ CRM + memory</div>
-        </div>
-        <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text">Everything in Pro</span></div>
-        <div class="pf-row"><span class="pf-icon">🔗</span><span class="pf-text">CRM sync — HubSpot, Salesforce, GoHighLevel</span></div>
-        <div class="pf-row"><span class="pf-icon">🧠</span><span class="pf-text">Relationship memory — context builds over time</span></div>
-        <div class="pf-row"><span class="pf-icon">🔗</span><span class="pf-text">LinkedIn auto-import · CSV bulk upload</span></div>
-        <div class="pf-row"><span class="pf-icon">🔔</span><span class="pf-text">Proactive nudges when contacts go cold</span></div>
-        <div class="pf-row"><span class="pf-icon">🔗</span><span class="pf-text">Zapier webhook — 5,000+ integrations</span></div>
-        <button class="btn-gold" style="margin-top:14px" onclick="alert(&#39;Starting Premium trial...&#39;)">Start Premium Trial →</button>
-      </div>
-
-      <!-- ENTERPRISE -->
-      <div class="pricing-card" style="margin-bottom:10px;border-color:rgba(0,153,85,0.3);background:#f5faf7">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="background:rgba(0,153,85,0.12);border:1px solid rgba(0,153,85,0.3);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:#007a3d">ENTERPRISE</div>
-          <div style="font-size:11px;color:#888">Up to 50 seats</div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1">$299<span style="font-size:13px;font-weight:400;color:rgba(245,230,200,0.7)">/mo</span></div>
-          <div style="font-size:11px;color:#888;text-align:right">Teams up to 50<br>full platform</div>
-        </div>
-        <div class="pf-row"><span class="pf-icon">👥</span><span class="pf-text"><strong>Up to 50 seats</strong> — shared team workspace</span></div>
-        <div class="pf-row"><span class="pf-icon">∞</span><span class="pf-text">Everything in Premium</span></div>
-        <div class="pf-row"><span class="pf-icon">🧠</span><span class="pf-text">RAG memory of team voice + profile + message style</span></div>
-        <div class="pf-row"><span class="pf-icon">💬</span><span class="pf-text">WhatsApp Business API — full bot integration</span></div>
-        <div class="pf-row"><span class="pf-icon">🔒</span><span class="pf-text">SSO + RLS security + audit logs</span></div>
-        <div class="pf-row"><span class="pf-icon">🎯</span><span class="pf-text">Dedicated CSM + onboarding + SLA</span></div>
-        <button class="btn-gold" style="margin-top:14px" onclick="alert(&#39;Contact sales...&#39;)">Contact Sales →</button>
+      <!-- COMPARE LINK -->
+      <div style="text-align:center;margin-top:6px;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--muted);cursor:pointer" onclick="document.getElementById('compare-table').style.display=document.getElementById('compare-table').style.display==='none'?'block':'none'">▾ Compare all features</span>
       </div>
 
       <!-- COMPARE TABLE -->
-      <div style="text-align:center;margin:6px 0">
-        <span style="font-size:12px;color:#f5d080;cursor:pointer;font-weight:600" onclick="document.getElementById(&#39;compare-table&#39;).style.display=document.getElementById(&#39;compare-table&#39;).style.display===&#39;none&#39;?&#39;block&#39;:&#39;none&#39;">▾ Compare all features</span>
-      </div>
-      <div id="compare-table" style="display:none;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:16px;overflow:hidden;margin-bottom:10px">
+      <div id="compare-table" style="display:none;background:var(--bg3);border:1px solid var(--faint);border-radius:16px;overflow:hidden;margin-bottom:10px">
         <table style="width:100%;border-collapse:collapse;font-size:11px">
-          <tbody><tr style="border-bottom:1px solid rgba(0,0,0,0.06)">
-            <th style="padding:10px 10px;text-align:left;color:#888;font-weight:600;background:#f5f7f5">Feature</th>
-            <th style="padding:10px 6px;text-align:center;color:#888;font-weight:600;background:#f5f7f5">Free</th>
-            <th style="padding:10px 6px;text-align:center;color:#009955;font-weight:600;background:#f5f7f5">Indiv</th>
-            <th style="padding:10px 6px;text-align:center;color:#009955;font-weight:700;background:#f5f7f5">Pro</th>
-            <th style="padding:10px 6px;text-align:center;color:#FFD000;font-weight:600;background:#f5f7f5">Prem</th>
-            <th style="padding:10px 6px;text-align:center;color:#007a3d;font-weight:600;background:#f5f7f5">Ent</th>
+          <tr style="border-bottom:1px solid var(--faint)">
+            <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600">Feature</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600">Free</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--lu);font-weight:600">Pro</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--gold2);font-weight:600">Teams</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--gold2);font-weight:600">Ent.</th>
           </tr>
-          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)"><td style="padding:8px 10px;color:#333">Contacts/mo</td><td style="text-align:center;color:#888">3</td><td style="text-align:center;color:#009955">10</td><td style="text-align:center;color:#009955">∞</td><td style="text-align:center;color:#009955">∞</td><td style="text-align:center;color:#009955">∞</td></tr>
-          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)"><td style="padding:8px 10px;color:#333">Hybrid RAG depth</td><td style="text-align:center;color:#888">30s</td><td style="text-align:center;color:#888">Basic</td><td style="text-align:center;color:#009955">Full</td><td style="text-align:center;color:#009955">Full</td><td style="text-align:center;color:#009955">Full+</td></tr>
-          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)"><td style="padding:8px 10px;color:#333">Voice Agent</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#009955">✓</td><td style="text-align:center;color:#009955">✓</td><td style="text-align:center;color:#009955">✓</td></tr>
-          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)"><td style="padding:8px 10px;color:#333">WA history</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#009955">✓</td><td style="text-align:center;color:#009955">✓</td><td style="text-align:center;color:#009955">✓</td></tr>
-          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)"><td style="padding:8px 10px;color:#333">CRM sync</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#009955">✓</td><td style="text-align:center;color:#009955">✓</td></tr>
-          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)"><td style="padding:8px 10px;color:#333">Rel. memory</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#009955">✓</td><td style="text-align:center;color:#009955">✓</td></tr>
-          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)"><td style="padding:8px 10px;color:#333">Team seats</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#009955">50</td></tr>
-          <tr><td style="padding:8px 10px;color:#333">WA Business API</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#e05555">✗</td><td style="text-align:center;color:#009955">✓</td></tr>
-        </tbody></table>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Contacts/mo</td><td style="text-align:center;color:var(--muted)">∞ quick</td><td style="text-align:center;color:var(--lu)">∞ deep</td><td style="text-align:center;color:var(--lu)">∞</td><td style="text-align:center;color:var(--lu)">∞</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Hybrid RAG depth</td><td style="text-align:center;color:var(--muted)">30s</td><td style="text-align:center;color:var(--lu)">Full</td><td style="text-align:center;color:var(--lu)">Full</td><td style="text-align:center;color:var(--lu)">Full</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Key Facts</td><td style="text-align:center;color:var(--muted)">3</td><td style="text-align:center;color:var(--lu)">5</td><td style="text-align:center;color:var(--lu)">5</td><td style="text-align:center;color:var(--lu)">5+</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Voice Agent draft</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">WA history analysis</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">Team seats</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">5</td><td style="text-align:center;color:var(--lu)">10+</td></tr>
+          <tr style="border-bottom:1px solid var(--faint)"><td style="padding:8px 12px;color:var(--text)">CRM sync</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+          <tr><td style="padding:8px 12px;color:var(--text)">SSO + audit logs</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--lu)">✓</td></tr>
+        </table>
       </div>
 
     </div>
 
     <!-- ANALYZE ANOTHER -->
-    <button class="btn-secondary" style="width:100%;margin-top:12px;padding:14px" onclick="goTo(6)">+ Analyze Another Contact</button>
+    <button class="btn-secondary" style="width:100%;margin-top:12px;padding:14px" onclick="goTo(5)">+ Analyze Another Contact</button>
     <div style="height:40px"></div>
   </div>
 </div>
@@ -1331,89 +944,19 @@ textarea.wa-input::placeholder { color: var(--muted); }
 <script>
 let currentScreen = 0;
 
-function resetDemo() {
-  // Hide all screens
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.add('hidden');
-    s.classList.remove('exit');
-  });
-  // Show screen 0
-  const s0 = document.getElementById('s0');
-  if (s0) s0.classList.remove('hidden');
-  currentScreen = 0;
-  // Scroll to top
-  document.querySelectorAll('.scroll-content').forEach(s => s.scrollTop = 0);
-}
-
 function goTo(n) {
   const cur = document.getElementById('s' + currentScreen);
   const next = document.getElementById('s' + n);
-  if (!next) { console.warn('Screen s'+n+' not found'); return; }
-  cur.classList.add('hidden');
-  cur.classList.remove('exit');
+  if (!next) return;
+  cur.classList.add('exit');
+  setTimeout(() => { cur.classList.remove('exit'); cur.classList.add('hidden'); }, 400);
   next.classList.remove('hidden');
-  next.style.display = 'flex';
-  const sc = next.querySelector('.scroll-content');
-  if (sc) sc.scrollTop = 0;
   currentScreen = n;
-  if (n === 7) runLoading();
+  if (n === 6) runLoading();
 }
 
 function toggleOption(el) {
   el.classList.toggle('selected');
-}
-
-let rankCount = 0;
-function rankChannelHandle(el, type) {
-  const handleRow = document.getElementById(type + '-handle-row');
-  const wasRanked = el.classList.contains('ranked');
-  rankChannel(el);
-  if (!wasRanked && handleRow) {
-    handleRow.style.display = 'block';
-    setTimeout(() => { document.getElementById(type + '-handle').focus(); }, 50);
-  } else if (wasRanked && handleRow) {
-    handleRow.style.display = 'none';
-    document.getElementById(type + '-handle').value = '';
-  }
-}
-
-function rankChannel(el) {
-  const slot = el.querySelector('[data-slot]');
-  if (el.classList.contains('ranked')) {
-    const num = parseInt(slot.textContent);
-    slot.textContent = '';
-    el.classList.remove('ranked');
-    document.querySelectorAll('.rank-item.ranked').forEach(r => {
-      const s = r.querySelector('[data-slot]');
-      const n = parseInt(s.textContent);
-      if (n > num) { s.textContent = n - 1; }
-    });
-    rankCount = Math.max(0, rankCount - 1);
-    return;
-  }
-  if (rankCount >= 4) return;
-  rankCount++;
-  slot.textContent = rankCount;
-  el.classList.add('ranked');
-}
-function resetRanks() {
-  document.querySelectorAll('.rank-item').forEach(r => {
-    r.classList.remove('ranked');
-    r.querySelector('[data-slot]').textContent = '';
-  });
-  ['ig','x'].forEach(t => {
-    const row = document.getElementById(t + '-handle-row');
-    const inp = document.getElementById(t + '-handle');
-    if (row) row.style.display = 'none';
-    if (inp) inp.value = '';
-  });
-  rankCount = 0;
-}
-
-function selectRadio2(el) {
-  const siblings = el.parentElement.querySelectorAll('.radio-item');
-  siblings.forEach(s => s.classList.remove('selected'));
-  el.classList.add('selected');
 }
 
 function selectRadio(el) {
@@ -1432,17 +975,15 @@ function selectChannel(ch) {
   selectedChannel = ch;
   const hint = document.querySelector('#s4 .input-hint-box') || document.querySelector('#s4 div[style*="border-radius:14px"]');
   const labels = {
-    wa: '✦ <strong style="color:var(--lu)">WhatsApp-first</strong> selected — Venn will use your chat history as the primary relationship signal, enriched with LinkedIn + web via Hybrid RAG.',
-    li: '✦ <strong style="color:var(--lu)">LinkedIn-first</strong> selected — Venn will research the profile URL and enrich with web data via Hybrid RAG.',
-    ig: '✦ <strong style="color:var(--lu)">Instagram-first</strong> selected — Venn will analyze DMs and profile for collab intelligence.',
-    csv: '✦ <strong style="color:var(--lu)">CRM/CSV import</strong> selected — Venn will batch-analyze your contacts and push intelligence back to your CRM.'
+    wa: '✦ <strong style="color:var(--lu)">WhatsApp-first</strong> selected — LevelUp will use your chat history as the primary relationship signal, enriched with LinkedIn + web via Hybrid RAG.',
+    li: '✦ <strong style="color:var(--lu)">LinkedIn-first</strong> selected — LevelUp will research the profile URL and enrich with web data via Hybrid RAG.',
+    ig: '✦ <strong style="color:var(--lu)">Instagram-first</strong> selected — LevelUp will analyze DMs and profile for collab intelligence.',
+    csv: '✦ <strong style="color:var(--lu)">CRM/CSV import</strong> selected — LevelUp will batch-analyze your contacts and push intelligence back to your CRM.'
   };
   if (hint) hint.innerHTML = labels[ch];
   const ctaBtn = document.querySelector('#s4 .btn-lu');
   const ctaLabels = { wa:'Continue with WhatsApp →', li:'Continue with LinkedIn →', ig:'Continue with Instagram →', csv:'Continue with CSV Import →' };
   if (ctaBtn) ctaBtn.textContent = ctaLabels[ch];
-  const liBtn = document.getElementById('channel-btn-li');
-  if (liBtn) liBtn.style.display = ch === 'wa' ? 'flex' : 'none';
 }
 
 function selectTone(el) {
@@ -1463,188 +1004,15 @@ function loadSample() {
 [12/03/25, 3:47 PM] Sarah: Yes please! Are you going to be at the NYC LP summit?
 [12/03/25, 3:48 PM] You: I'll be there 18-20. Coffee?
 [12/03/25, 3:49 PM] Sarah: Perfect timing 👌`;
-  document.getElementById('contactName').value = 'Andrew Ng';
-  document.getElementById('linkedinUrl').value = 'linkedin.com/in/andrewyng';
-  document.getElementById('contactTitle').value = 'Co-founder';
-  document.getElementById('contactCompany').value = 'Coursera / DeepLearning.AI';
-  document.getElementById('waPhone') && (document.getElementById('waPhone').value = '+1 650 555 0100');
+  document.getElementById('contactName').value = 'Sarah Chen';
+  document.getElementById('linkedinUrl').value = 'linkedin.com/in/sarahchen-sequoia';
 }
-
-const N8N_URL = 'https://n8n-production-e7a9.up.railway.app/webhook/venn-agent';
-const CLAUDE_URL = 'https://api.anthropic.com/v1/messages';
 
 function startAnalysis() {
-  const nameEl = document.getElementById('contactName');
-  const liEl = document.getElementById('linkedinUrl');
-  const waEl = document.getElementById('waText');
-  const titleEl = document.getElementById('contactTitle');
-  const companyEl = document.getElementById('contactCompany');
-  const websiteEl = document.getElementById('websiteUrl');
-  const waPhoneEl = document.getElementById('waPhone');
-
-  const name = nameEl ? nameEl.value.trim() : '';
-  const linkedin = liEl ? liEl.value.trim() : '';
-  const waText = waEl ? waEl.value.trim() : '';
-  const title = titleEl ? titleEl.value.trim() : '';
-  const company = companyEl ? companyEl.value.trim() : '';
-  const website = websiteEl ? websiteEl.value.trim() : '';
-  const waPhone = waPhoneEl ? waPhoneEl.value.trim() : '';
-
-  // Build display name — name field always wins
-  let displayName = (name && name.trim().length > 0) ? name.trim() : '';
-  if (!displayName && linkedin) {
-    // Only extract from /in/ slug, never from domain
-    const inMatch = linkedin.match(/linkedin\.com\/in\/([^\/?#]+)/);
-    if (inMatch && inMatch[1]) {
-      let slug = inMatch[1].replace(/-/g, ' ').trim();
-      displayName = slug.split(' ').map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
-    }
-  }
-  // Never use domain as name
-  if (!displayName || displayName.toLowerCase() === 'linkedin.com' || displayName.toLowerCase() === 'linkedin') {
-    displayName = 'Your Contact';
-  }
-
-  // Update loading screen with real name
-  const lsNameEl = document.getElementById('lsName');
-  if (lsNameEl) lsNameEl.textContent = displayName;
-
-  // Pre-fill output name immediately
-  const outNameEl = document.getElementById('outName');
-  if (outNameEl) outNameEl.textContent = displayName;
-
-  goTo(7);
-
-  const payload = {
-    name: displayName,
-    linkedin_url: linkedin || null,
-    whatsapp_text: waText || null,
-    website_url: website || null,
-    whatsapp_phone: waPhone || null,
-    title: title || null,
-    company: company || null,
-    user_id: '00000000-0000-0000-0000-000000000001',
-    scheduling_pref: 'google'
-  };
-
-  // Show "researching" state in output
-  document.querySelectorAll('#s8 .fact-text').forEach(function(el) { el.textContent = 'Researching ' + displayName + '...'; });
-  document.querySelectorAll('#s8 .tp-text').forEach(function(el) { el.textContent = 'Analyzing...'; });
-  const draftEl = document.getElementById('draftText');
-  if (draftEl) draftEl.innerHTML = 'Drafting personalized message for ' + displayName + '...';
-
-  // Call API via n8n (server-side, no CORS issues)
-  makeFallbackData(displayName, linkedin, company, title, waText).then(function(result) {
-    renderOutput(displayName, linkedin, result);
-  });
-}
-
-function renderOutput(name, linkedin, data) {
-  var displayN = (name && name !== 'Your Contact' && !name.toLowerCase().includes('linkedin.com')) ? name : 'Your Contact';
-  // Update contact name
-  var outEl = document.getElementById('outName');
-  if (outEl) outEl.textContent = displayN;
-  // Update loading name
-  var lsEl = document.getElementById('lsName');
-  if (lsEl) lsEl.textContent = displayN;
-  // Update contact role line
-  var roleEl = document.querySelector('#s8 .contact-role');
-  if (roleEl && data) {
-    var roleText = '';
-    if (data.key_facts && data.key_facts[0]) roleText = data.key_facts[0];
-    // Don't replace if it has real content already
-  }
-  // Update LinkedIn badge in contact card
-  var liUrl = linkedin ? (linkedin.startsWith('http') ? linkedin : 'https://' + linkedin) : null;
-  // Update LinkedIn badge
-  var liBadge = document.getElementById('outLiBadge');
-  if (liBadge && liUrl) liBadge.textContent = '💼 ' + liUrl.replace('https://','');
-  // Update role line
-  var outRole = document.getElementById('outRole');
-  if (outRole && data && data.key_facts && data.key_facts[0]) {
-    outRole.textContent = data.key_facts[0].substring(0, 80);
-  }
-  if (liUrl) {
-    document.querySelectorAll('#s8 .src-link').forEach(function(a) {
-      if (a.textContent && a.textContent.includes('LinkedIn')) {
-        a.href = liUrl;
-        a.textContent = '💼 LinkedIn ↗';
-      }
-    });
-    document.querySelectorAll('#s8 .src-link').forEach(function(a) {
-      if (a.href && a.href.includes('google.com/search')) {
-        a.href = 'https://www.google.com/search?q=' + encodeURIComponent(name || '');
-      }
-    });
-  }
-  // Update ALL src-link source pills to point to entered LinkedIn URL
-  // Update role line
-  var outRole = document.getElementById('outRole');
-  if (outRole && data && data.key_facts && data.key_facts[0]) {
-    outRole.textContent = data.key_facts[0].substring(0, 80);
-  }
-  if (liUrl) {
-    document.querySelectorAll('#s8 .src-link').forEach(function(a) {
-      if (a.textContent.includes('LinkedIn') || a.id && a.id.includes('li')) {
-        a.href = liUrl;
-        a.textContent = '💼 LinkedIn ↗';
-      }
-    });
-    // Update all generic google search links with the contact name
-    document.querySelectorAll('#s8 .src-link').forEach(function(a) {
-      if (a.href && a.href.includes('google.com/search')) {
-        a.href = 'https://www.google.com/search?q=' + encodeURIComponent(name);
-      }
-    });
-  }
-  // Clear hardcoded Sarah Chen demo data before rendering real data
-  if (data) {
-    document.querySelectorAll('#s8 .fact-text').forEach((el,i) => { el.textContent = '...'; });
-    document.querySelectorAll('#s8 .tp-text').forEach(el => { el.textContent = '...'; });
-    document.querySelectorAll('#s8 .action-text').forEach(el => { el.textContent = '...'; });
-  }
-  if (!data) return;
-  const d = data;
-  // Talking points
-  if (d.talking_points && d.talking_points.length) {
-    const tpCards = document.querySelectorAll('#s8 .talking-card');
-    const tpLabels = ['SHARED THESIS','OPPORTUNITY','TIMING HOOK'];
-    d.talking_points.forEach((tp, i) => {
-      if (tpCards[i]) {
-        const textEl = tpCards[i].querySelector('.tp-text');
-        const labelEl = tpCards[i].querySelector('.tp-label');
-        if (textEl) textEl.textContent = tp;
-        if (labelEl) labelEl.innerHTML = '<div class="tp-num">' + (i+1) + '</div> ' + (tpLabels[i] || 'INSIGHT');
-        const quote = tpCards[i].querySelector('.tp-quote-text');
-        if (quote) quote.style.display = 'none';
-      }
-    });
-  }
-  // Key facts
-  if (d.key_facts && d.key_facts.length) {
-    const factItems = document.querySelectorAll('#s8 .fact-item');
-    d.key_facts.forEach((fact, i) => {
-      if (factItems[i]) {
-        const textEl = factItems[i].querySelector('.fact-text');
-        if (textEl) textEl.textContent = fact;
-      }
-    });
-  }
-  // Draft message
-  if (d.draft_message) {
-    const draftEl = document.getElementById('draftText');
-    if (draftEl) draftEl.innerHTML = d.draft_message.split('\n').join('<br>');
-  }
-  // Action items
-  if (d.action_items && d.action_items.length) {
-    const actionItems = document.querySelectorAll('#s8 .action-item');
-    d.action_items.forEach((item, i) => {
-      if (actionItems[i]) {
-        const textEl = actionItems[i].querySelector('.action-text');
-        if (textEl) textEl.textContent = item;
-      }
-    });
-  }
+  const name = document.getElementById('contactName').value || 'Sarah Chen';
+  document.getElementById('lsName').textContent = name;
+  document.getElementById('outName').textContent = name;
+  goTo(6);
 }
 
 function runLoading() {
@@ -1668,94 +1036,15 @@ function runLoading() {
       if(next) next.classList.add('active');
     } else {
       clearInterval(interval);
-      setTimeout(() => goTo(8), 500);
+      setTimeout(() => goTo(7), 500);
     }
   }, 750);
-}
-
-function updateLinkedInPreview(val) {
-  if (!val) return;
-  const url = val.trim();
-  const slug = url.replace(/.*linkedin\.com\/in\//,'').replace(/\//,'').split('?')[0];
-  if (slug) {
-    const srcLink = document.querySelector('#s8 .src-link[href*="sarahchen"]');
-    if (srcLink) srcLink.href = 'https://' + (url.startsWith('http') ? url.replace('https://','') : url);
-  }
-}
-
-function regenMessage() {
-  const toneEl = document.querySelector('.tone-chip.selected');
-  const tone = toneEl ? toneEl.textContent.trim() : 'Professional';
-  const feedbackEl = document.querySelector('.feedback-input');
-  const feedback = feedbackEl ? feedbackEl.value.trim() : '';
-  const btn = document.querySelector('.btn-regen');
-  if (!btn) return;
-  btn.textContent = 'Regenerating...';
-  btn.disabled = true;
-
-  // Get current contact info from inputs or output
-  const nameEl = document.getElementById('contactName');
-  const liEl = document.getElementById('linkedinUrl');
-  const contactName = nameEl ? (nameEl.value.trim() || document.getElementById('outName').textContent) : document.getElementById('outName').textContent;
-  const firstName = contactName.split(' ')[0] || 'there';
-  const liUrl = liEl ? liEl.value.trim() : '';
-  const feedbackNote = feedback ? '<br><br>Incorporating your feedback: ' + feedback : '';
-
-  const toneMap = {
-    'Professional': 'Hey ' + firstName + ' - great connecting. I have been building relationship intelligence tooling that maps directly to what you are working on.<br><br>Would love to show you a quick demo and get your thoughts. 15-20 mins on Zoom?<br><br>- [Your name]',
-    'Friendly': 'Hey ' + firstName + '! Really enjoyed our conversation.<br><br>I am building something I think you will find interesting - would love to grab 15 mins and show you. Coffee or Zoom?',
-    'Concise': firstName + ' - Venn.ai, relationship intelligence for WhatsApp + LinkedIn. Think it maps to your work. 15-min demo?',
-    'Warm': 'Hi ' + firstName + ', it was such a pleasure connecting! Your perspective really resonated with what we are building at Venn.<br><br>Would love to stay in touch - coffee or a quick Zoom soon?',
-    'Direct': firstName + ' - saw your work at ' + (document.getElementById('contactCompany') ? document.getElementById('contactCompany').value || 'your company' : 'your company') + '. Direct ask: 15 mins to show you Venn? [Calendly link]',
-    'Formal': 'Dear ' + firstName + ',<br><br>I wanted to follow up on our recent connection. I am building a relationship intelligence platform that I believe aligns with your work.<br><br>I would welcome the opportunity to schedule a brief call. Please find my calendar link below.',
-    'Excited': firstName + '!! Was SO great connecting! I am building something that I think you will absolutely love - it is right in your wheelhouse.<br><br>Can we jump on a quick call this week?! Dropping my Calendly!',
-    'Results-Driven': firstName + ' - 30 seconds of research vs 30 minutes. That is what Venn delivers on every contact. Want to see the numbers? 15-min demo.',
-  };
-
-  setTimeout(function() {
-    const el = document.getElementById('draftText');
-    if (el) el.innerHTML = (toneMap[tone] || toneMap['Professional']) + feedbackNote;
-    btn.textContent = '✨ Regenerate Message';
-    btn.disabled = false;
-    // Clear feedback box after use
-    if (feedbackEl && feedback) feedbackEl.value = '';
-  }, 900);
-}
-function startVoiceInput(btn) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    alert('Voice input not supported in this browser. Try Chrome on Android or desktop Chrome.');
-    return;
-  }
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  btn.textContent = '🔴';
-  btn.style.background = '#ffeeee';
-  recognition.start();
-  recognition.onresult = function(event) {
-    const transcript = event.results[0][0].transcript;
-    const feedbackEl = document.querySelector('.feedback-input');
-    if (feedbackEl) {
-      feedbackEl.value = (feedbackEl.value ? feedbackEl.value + ' ' : '') + transcript;
-    }
-    btn.textContent = '🎙️';
-    btn.style.background = '';
-  };
-  recognition.onerror = function() { btn.textContent = '🎙️'; btn.style.background = ''; };
-  recognition.onend = function() { btn.textContent = '🎙️'; btn.style.background = ''; };
 }
 
 function sendWA() {
   const draft = document.getElementById('draftText').innerText;
   const encoded = encodeURIComponent(draft);
   window.open('https://wa.me/?text=' + encoded, '_blank');
-}
-function sendLinkedIn() {
-  const draft = document.getElementById('draftText').innerText;
-  const encoded = encodeURIComponent(draft);
-  window.open('https://www.linkedin.com/messaging/compose?body=' + encoded, '_blank');
 }
 
 let currentBilling = 'quarterly';
@@ -1800,118 +1089,6 @@ function showTiers(view) {
 function toggleTierView() {
   showTiers(currentTierView === 'individual' ? 'team' : 'individual');
 }
-
-// CSV PARSER
-function parseCSV(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = e.target.result;
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
-    if (lines.length < 2) return;
-    
-    // Parse header row — find relevant columns
-    const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
-    const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('first'));
-    const lastIdx = headers.findIndex(h => h.includes('last'));
-    const liIdx = headers.findIndex(h => h.includes('linkedin') || h.includes('profile'));
-    const companyIdx = headers.findIndex(h => h.includes('company') || h.includes('organization'));
-    const titleIdx = headers.findIndex(h => h.includes('title') || h.includes('job'));
-    
-    const contacts = [];
-    for (let i = 1; i < Math.min(lines.length, 51); i++) {
-      const cols = parseCSVLine(lines[i]);
-      if (!cols.length) continue;
-      const first = nameIdx >= 0 ? (cols[nameIdx] || '') : '';
-      const last = lastIdx >= 0 ? (cols[lastIdx] || '') : '';
-      const name = (first + ' ' + last).trim() || 'Contact ' + i;
-      const li = liIdx >= 0 ? (cols[liIdx] || '') : '';
-      const company = companyIdx >= 0 ? (cols[companyIdx] || '') : '';
-      const title = titleIdx >= 0 ? (cols[titleIdx] || '') : '';
-      if (name || li) contacts.push({ name, li, company, title });
-    }
-    
-    renderCSVContacts(contacts);
-  };
-  reader.readAsText(file);
-}
-
-function parseCSVLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') { inQuotes = !inQuotes; }
-    else if (c === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
-    else { current += c; }
-  }
-  result.push(current.trim());
-  return result;
-}
-
-function renderCSVContacts(contacts) {
-  const list = document.getElementById('csv-contact-list');
-  const count = document.getElementById('csv-count');
-  const results = document.getElementById('csv-results');
-  if (!contacts.length) { list.innerHTML = '<div style="font-size:12px;color:#888;padding:8px">No contacts found — check your CSV has Name and LinkedIn URL columns</div>'; results.style.display = 'block'; return; }
-  list.innerHTML = contacts.map((c, i) => `
-    <div onclick="selectCSVContact(${i})" style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='#009955'" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)'">
-      <div style="width:32px;height:32px;border-radius:50%;background:rgba(0,153,85,0.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">👤</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
-        <div style="font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${[c.title, c.company].filter(Boolean).join(' · ') || c.li || 'No details'}</div>
-      </div>
-      <div style="font-size:11px;color:#009955;font-weight:600;flex-shrink:0">${c.li ? '💼' : ''}</div>
-    </div>
-  `).join('');
-  count.textContent = contacts.length + ' contacts found' + (contacts.length === 50 ? ' (showing first 50)' : '');
-  results.style.display = 'block';
-  window._csvContacts = contacts;
-}
-
-function selectCSVContact(i) {
-  const c = window._csvContacts[i];
-  document.getElementById('linkedinUrl').value = c.li || '';
-  document.getElementById('contactName').value = c.name || '';
-  document.getElementById('contactTitle').value = c.title || '';
-  document.getElementById('contactCompany').value = c.company || '';
-  document.getElementById('csv-results').style.display = 'none';
-  document.getElementById('csv-drop-zone').style.borderColor = '#009955';
-  document.getElementById('csv-drop-zone').style.background = '#f0faf4';
-  window.scrollTo(0, document.getElementById('contactName').offsetTop - 20);
-}
-
-// PWA — register service worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
-
-// PWA — install prompt
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.getElementById('install-btn');
-  if (btn) btn.style.display = 'flex';
-});
-
-function installPWA() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-  const btn = document.getElementById('install-btn');
-  if (btn) btn.style.display = 'none';
-}
-
-window.addEventListener('appinstalled', () => {
-  const btn = document.getElementById('install-btn');
-  if (btn) btn.style.display = 'none';
-});
 </script>
-
-
-</body></html>
+</body>
+</html>
